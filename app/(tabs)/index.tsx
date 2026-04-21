@@ -7,11 +7,13 @@ import {
   getPredictionData,
 } from "@/lib/predictions";
 import { format } from "date-fns";
-import React, { useState } from "react";
+import { CalendarMinus, FlameIcon } from "lucide-react-native";
+import React, { useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from "react-native";
@@ -79,26 +81,77 @@ export default function HomeScreen() {
   const { cycles } = useCycles();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "good morning.";
+    if (hour >= 12 && hour < 18) return "good afternoon.";
+    return "good evening.";
+  }, []);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          Cycle Tracker
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.icon }]}>
-          {cycles.length === 0
-            ? "Log your first period to get predictions"
-            : "Your cycle at a glance"}
-        </Text>
-
-        <Calendar
-          cycles={cycles}
-          currentMonth={currentMonth}
-          onMonthChange={setCurrentMonth}
-        />
-        <StatsOverview />
-
-        <View style={styles.legendContainer}>
+        <View
+          className="border"
+          style={{
+            backgroundColor: "#fff",
+            paddingTop: 50,
+          }}
+        >
+          <View
+            className="flex items-center justify-between"
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              paddingHorizontal: 15,
+            }}
+          >
+            <View
+              className="flex items-center border"
+              style={{
+                borderRadius: 99,
+                paddingHorizontal: 7,
+                paddingVertical: 3,
+                gap: 3,
+                flexDirection: "row",
+                alignItems: "center",
+                borderWidth: 1,
+                borderColor: colors.input,
+              }}
+            >
+              <FlameIcon className="text-orange-500" color="orange" size={14} />
+              <Text>18</Text>
+            </View>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: colors.text,
+                  textAlign: "center",
+                  marginBottom: 10,
+                },
+              ]}
+            >
+              {greeting}
+            </Text>
+            <TouchableOpacity>
+              <CalendarMinus />
+            </TouchableOpacity>
+          </View>
+          {/*<Text style={[styles.subtitle, { color: colors.icon }]}>
+            {cycles.length === 0
+              ? "Log your first period to get predictions"
+              : "Your cycle at a glance"}
+          </Text>*/}
+          <Calendar
+            cycles={cycles}
+            currentMonth={currentMonth}
+            onMonthChange={setCurrentMonth}
+          />
+        </View>
+        c<StatsOverview />
+        {/*<View style={styles.legendContainer}>
           <Text style={[styles.legendTitle, { color: colors.text }]}>
             Legend
           </Text>
@@ -128,7 +181,7 @@ export default function HomeScreen() {
               Ovulation
             </Text>
           </View>
-        </View>
+        </View>*/}
       </ScrollView>
     </View>
   );
@@ -139,8 +192,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingTop: 60,
+    // padding: 16,
+    // paddingTop: 60,
   },
   title: {
     fontSize: 32,

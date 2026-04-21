@@ -108,18 +108,16 @@ export function Calendar({
           onPress={() => onMonthChange(subMonths(currentMonth, 1))}
           style={styles.navButton}
         >
-          <ChevronLeftIcon color={colors.tint} size={24} />
-          {/*<Text style={[styles.navText, { color: colors.tint }]}>&lt;</Text>*/}
+          <ChevronLeftIcon size={20} />
         </TouchableOpacity>
-        <Text style={[styles.monthTitle, { color: colors.text }]}>
+        <Text style={[styles.monthTitle, { color: colors.text, fontSize: 16 }]}>
           {format(currentMonth, "MMMM yyyy")}
         </Text>
         <TouchableOpacity
           onPress={() => onMonthChange(addMonths(currentMonth, 1))}
           style={styles.navButton}
         >
-          <ChevronRightIcon color={colors.tint} size={24} />
-          {/*<Text style={[styles.navText, { color: colors.tint }]}>&gt;</Text>*/}
+          <ChevronRightIcon size={20} />
         </TouchableOpacity>
       </View>
 

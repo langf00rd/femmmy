@@ -1,5 +1,3 @@
-import { Platform } from "react-native";
-
 /**
  * Material Design 3 Tonal Palettes
  * Primary: Pink/Rose (Period/Brand)
@@ -17,10 +15,10 @@ const secondaryBlueDarkContainer = "#244777";
 export const Colors = {
   light: {
     text: "#1D1A1C", // M3 On Surface
-    background: "#FFF8F9", // M3 Surface
+    background: "#F3F3F5", // M3 Surface
     tint: primaryPink,
     icon: "#4E444B", // M3 On Surface Variant
-    tabIconDefault: "#4E444B",
+    tabIconDefault: "#8D8D8F99",
     tabIconSelected: primaryPink,
 
     // Feature Specific
@@ -33,6 +31,8 @@ export const Colors = {
     success: "#2E6C39",
     warning: "#895100",
     danger: "#BA1A1A",
+
+    input: "#E9E0E2",
   },
   dark: {
     text: "#E9E0E2", // M3 On Surface (Dark)
@@ -52,27 +52,7 @@ export const Colors = {
     success: "#96D597",
     warning: "#FFB951",
     danger: "#FFB4AB",
+
+    input: "#E9E0E2",
   },
 };
-
-export const Fonts = Platform.select({
-  ios: {
-    sans: "system-ui",
-    serif: "ui-serif",
-    rounded: "ui-rounded",
-    mono: "ui-monospace",
-  },
-  default: {
-    sans: "normal",
-    serif: "serif",
-    rounded: "normal",
-    mono: "monospace",
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded:
-      "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
