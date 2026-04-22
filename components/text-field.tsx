@@ -5,6 +5,10 @@ export default function TextField({ ...props }) {
     <TextInput
       {...props}
       className={`border border-neutral-200 px-4 rounded-md shadow-sm bg-white ${props.className}`}
+      style={{
+        ...props.style,
+        fontFamily: "DMSans",
+      }}
     />
   );
 }

@@ -1,10 +1,6 @@
 import { COLORS } from "@/lib/theme";
-import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-  ViewStyle,
-} from "react-native";
+import { ActivityIndicator, TouchableOpacity, ViewStyle } from "react-native";
+import { SansText } from "./text";
 
 interface ButtonProps {
   title: string;
@@ -61,7 +57,7 @@ export function Button({
       {loading ? (
         <ActivityIndicator />
       ) : (
-        <Text className={`font-semibold text-white`}>{title}</Text>
+        <SansText className={`text-white`}>{title}</SansText>
       )}
     </TouchableOpacity>
   );

@@ -1,10 +1,11 @@
 import { AppBar } from "@/components/app-bar";
 import { Calendar } from "@/components/calendar";
+import { SansText } from "@/components/text";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 
 export default function Timeline() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Timeline() {
             <TouchableOpacity className="p-2" onPress={() => router.back()}>
               <ChevronLeft size={24} color="#374151" />
             </TouchableOpacity>
-            <Text className="text-xl font-medium">Timeline</Text>
+            <SansText className="text-xl">Timeline</SansText>
           </View>
         }
       />

@@ -5,17 +5,17 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
-import { forwardRef, useMemo, useState } from "react";
+import { forwardRef, useState } from "react";
 import {
   Alert,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Button } from "./button";
 import Label from "./label";
+import { SansText } from "./text";
 import TextField from "./text-field";
 
 const SYMPTOM_OPTIONS = [
@@ -35,8 +35,7 @@ interface LogBottomSheetProps {
 
 export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
   ({ onClose }, ref) => {
-    const snapPoints = useMemo(() => ["90%"], []);
-    const { cycles, addCycle } = useCycles();
+    const { addCycle } = useCycles();
 
     const today = startOfDay(new Date());
     const todayStr = format(today, "yyyy-MM-dd");
@@ -121,10 +120,13 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
         >
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View className="mb-10">
-              <Text className="text-[1.5rem] font-medium mb-1.5">
+              <SansText
+                className="text-[1.5rem] mb-1.5"
+                style={{ fontWeight: 500 }}
+              >
                 Log your period
-              </Text>
-              <Text
+              </SansText>
+              <SansText
                 className="text-[15.5px] leading-6"
                 style={{
                   color: COLORS.mutedForeground,
@@ -132,7 +134,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
               >
                 Tell us about your period so we can help you better track your
                 cycle
-              </Text>
+              </SansText>
             </View>
 
             <View className="mb-10">
@@ -159,10 +161,10 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                 </View>
               </View>
               {periodDuration() > 0 && (
-                <Text className="mt-2 text-neutral-400">
+                <SansText className="mt-2 text-neutral-400">
                   Duration: {periodDuration()} day
                   {periodDuration() > 1 ? "s" : ""}
-                </Text>
+                </SansText>
               )}
             </View>
 
@@ -181,13 +183,13 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                         backgroundColor: isSelected ? "#000" : undefined,
                       }}
                     >
-                      <Text
+                      <SansText
                         className={
                           isSelected ? "text-white" : "text-neutral-500"
                         }
                       >
                         {symptom}
-                      </Text>
+                      </SansText>
                     </TouchableOpacity>
                   );
                 })}

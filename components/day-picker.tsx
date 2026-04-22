@@ -1,7 +1,8 @@
 import type { CycleEntry } from "@/lib/types";
 import { eachDayOfInterval, endOfMonth, format, isToday } from "date-fns";
 import { useMemo } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { SansText } from "./text";
 
 interface DayPickerProps {
   cycles: CycleEntry[];
@@ -119,9 +120,9 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
 
   return (
     <View className="w-12 items-center mx-1">
-      <Text className="text-[10px] text-neutral-400 font-medium mb-1">
+      <SansText className="text-[10px] text-neutral-400 mb-1">
         {format(date, "EEE")}
-      </Text>
+      </SansText>
       <View
         className={[
           "w-10 h-10 rounded-full items-center justify-center border",
@@ -130,9 +131,9 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
           todayUnderline,
         ].join(" ")}
       >
-        <Text className={["text-sm font-medium", textColor].join(" ")}>
+        <SansText className={["text-sm", textColor].join(" ")}>
           {format(date, "d")}
-        </Text>
+        </SansText>
       </View>
     </View>
   );
@@ -149,7 +150,7 @@ export function DayPicker({ cycles }: DayPickerProps) {
   const predictedDates = useMemo(() => getPredictedDates(cycles), [cycles]);
 
   return (
-    <View className="bg-white border-b border-b-neutral-200 py-3">
+    <View className="bg-white border-b border-b-neutral-100 py-3">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}

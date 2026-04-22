@@ -1,10 +1,13 @@
 import { PropsWithChildren } from "react";
-import { Text } from "react-native";
+import { SansText } from "./text";
 
 export default function Label(props: PropsWithChildren) {
   return (
-    <Text className="mb-2 text-neutral-400 font-medium uppercase">
+    <SansText
+      className="mb-2 text-neutral-400 uppercase"
+      style={{ fontWeight: 600 }}
+    >
       {props.children}
-    </Text>
+    </SansText>
   );
 }

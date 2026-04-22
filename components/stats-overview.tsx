@@ -5,7 +5,8 @@ import {
   getPredictionData,
 } from "@/lib/predictions";
 import { format } from "date-fns";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { SansText } from "./text";
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -21,16 +22,16 @@ function StatCard({
   accent: string;
 }) {
   return (
-    <View className="flex-1 bg-white rounded-2xl p-5 items-center shadow-sm shadow-gray-100 border border-gray-50">
-      <Text className={`text-4xl font-bold tracking-tight ${accent}`}>
+    <View className="flex-1 bg-white rounded-md p-5 items-center shadow-sm shadow-neutral-100 border border-neutral-50">
+      <SansText className={`text-4xl tracking-tight ${accent}`}>
         {value}
-      </Text>
+      </SansText>
       {unit && (
-        <Text className="text-xs text-gray-400 font-medium mt-1">{unit}</Text>
+        <SansText className="text-xs text-neutral-400 mt-1">{unit}</SansText>
       )}
-      <Text className="text-xs text-gray-500 font-medium text-center mt-3 leading-4">
+      <SansText className="text-xs text-neutral-500 text-center mt-3 leading-4">
         {label}
-      </Text>
+      </SansText>
     </View>
   );
 }
@@ -47,17 +48,20 @@ function PredictionCard({
   accent: string;
 }) {
   return (
-    <View className="bg-white rounded-2xl p-5 border border-gray-50 shadow-sm shadow-gray-100">
-      <Text className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3">
+    <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100">
+      <SansText className="text-neutral-400 text-sm uppercase mb-3">
         {label}
-      </Text>
-      <Text className={`text-2xl font-bold tracking-tight ${accent}`}>
+      </SansText>
+      <SansText
+        className={`text-2xl tracking-tight ${accent}`}
+        style={{ fontWeight: 500 }}
+      >
         {format(startDate, "MMM d, yyyy")}
-      </Text>
+      </SansText>
       {endDate && (
-        <Text className="text-sm text-gray-400 font-medium mt-1">
+        <SansText className="text-sm text-neutral-400 mt-1">
           → {format(endDate, "MMM d")}
-        </Text>
+        </SansText>
       )}
     </View>
   );
@@ -65,9 +69,12 @@ function PredictionCard({
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <Text className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest mb-3 mt-7 px-1">
+    <SansText
+      className="text-[11px] text-neutral-400 uppercase tracking-widest mb-3 mt-7 px-1"
+      style={{ fontWeight: 600 }}
+    >
       {children}
-    </Text>
+    </SansText>
   );
 }
 
@@ -84,14 +91,14 @@ export function StatsOverview() {
     return (
       <View className="flex-1 items-center justify-center px-8">
         <View className="w-14 h-14 rounded-full bg-rose-50 items-center justify-center mb-4">
-          <Text className="text-2xl">🌸</Text>
+          <SansText className="text-2xl">🌸</SansText>
         </View>
-        <Text className="text-base font-semibold text-gray-700 text-center">
+        <SansText className="text-base text-neutral-700 text-center">
           No data yet
-        </Text>
-        <Text className="text-sm text-gray-400 text-center mt-2 leading-5">
+        </SansText>
+        <SansText className="text-sm text-neutral-400 text-center mt-2 leading-5">
           Log at least one period to start seeing insights
-        </Text>
+        </SansText>
       </View>
     );
   }
@@ -143,22 +150,22 @@ export function StatsOverview() {
       )}
 
       <SectionTitle>Summary</SectionTitle>
-      <View className="bg-white rounded-2xl p-5 border border-gray-50 shadow-sm shadow-gray-100 gap-2">
+      <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100 gap-2">
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm text-gray-400 font-medium">
+          <SansText className="text-sm text-neutral-400">
             Cycles logged
-          </Text>
-          <Text className="text-sm font-semibold text-gray-700">
+          </SansText>
+          <SansText className="text-sm text-neutral-700">
             {cycles.length}
-          </Text>
+          </SansText>
         </View>
-        <View className="h-px bg-gray-100" />
+        <View className="h-px bg-neutral-100" />
         <View className="flex-row items-center justify-between">
-          <Text className="text-sm text-gray-400 font-medium">Based on</Text>
-          <Text className="text-sm font-semibold text-gray-700">
+          <SansText className="text-sm text-neutral-400">Based on</SansText>
+          <SansText className="text-sm text-neutral-700">
             {Math.min(cycles.length, 6)} most recent cycle
             {Math.min(cycles.length, 6) !== 1 ? "s" : ""}
-          </Text>
+          </SansText>
         </View>
       </View>
     </ScrollView>

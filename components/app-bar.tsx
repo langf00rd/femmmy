@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { SansText } from "./text";
 
 export function AppBar(props: {
   title?: string;
@@ -13,9 +14,9 @@ export function AppBar(props: {
     >
       <View className="flex items-center justify-between flex-row px-4 pl-0">
         {props.leading}
-        <Text className={`text-3xl font-medium ${props.titleClassName}`}>
+        <SansText className={`text-3xl ${props.titleClassName}`}>
           {props.title}
-        </Text>
+        </SansText>
         {props.action}
       </View>
     </View>

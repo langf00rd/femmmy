@@ -11,6 +11,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import React, { useMemo } from "react";
+import { SansText } from "./text";
 import { Text, View } from "react-native";
 
 // ─── types ────────────────────────────────────────────────────────────────────
@@ -167,7 +168,7 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
       : isFertileHighlighted
         ? "text-emerald-700"
         : "text-neutral-800";
-  const textWeight = today ? "font-bold" : "font-normal";
+  const textWeight = today ? "" : "";
 
   return (
     <View className="flex-1 aspect-square p-2">
@@ -179,13 +180,13 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
           "rounded-full",
         ].join(" ")}
       >
-        <Text
+        <SansText
           className={["text-[13px] leading-none", textColor, textWeight].join(
             " ",
           )}
         >
           {format(day, "d")}
-        </Text>
+        </SansText>
       </View>
     </View>
   );
@@ -204,7 +205,7 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
 //       {items.map(({ color, label }) => (
 //         <View key={label} className="flex-row items-center gap-x-1.5">
 //           <View className={["w-2.5 h-2.5 rounded-full", color].join(" ")} />
-//           <Text className="text-[11px] text-neutral-400 font-medium">
+//           <Text className="text-[11px] text-neutral-400">
 //             {label}
 //           </Text>
 //         </View>
@@ -226,16 +227,16 @@ export function Calendar({ cycles, currentMonth }: CalendarProps) {
           key={month.getTime()}
           className="py-4 border-b border-neutral-100"
         >
-          <Text className="text-sm ml-4 font-medium text-neutral-400 mb-4">
+          <SansText className="text-sm ml-4 text-neutral-400 mb-4">
             {format(month, "MMMM yyyy")}
-          </Text>
+          </SansText>
 
           <View className="flex-row mb-1">
             {WEEK_DAYS.map((day) => (
               <View key={day} className="flex-1 items-center py-1">
-                <Text className="text-[11px] text-neutral-400 uppercase">
+                <SansText className="text-[11px] text-neutral-400 uppercase">
                   {day}
-                </Text>
+                </SansText>
               </View>
             ))}
           </View>

@@ -3,16 +3,18 @@ import { DayPicker } from "@/components/day-picker";
 import { LogBottomSheet } from "@/components/log-bottom-sheet";
 import { StatsOverview } from "@/components/stats-overview";
 import { useCycles } from "@/context/cycle";
+import { useLocalFont } from "@/hooks/use-font";
 import { COLORS } from "@/lib/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
-  const router = useRouter();
+  useLocalFont();
   const { cycles } = useCycles();
+  const router = useRouter();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [, setSheetOpen] = useState(false);
 
@@ -33,12 +35,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View
-      className="flex-1"
-      style={{
-        backgroundColor: COLORS.background,
-      }}
-    >
+    <View className="flex-1 " style={{ backgroundColor: COLORS.background }}>
       <AppBar
         className="pl-4"
         title={greeting}
@@ -66,25 +63,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  fab: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#e11d48",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 4,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 4,
-  },
-});

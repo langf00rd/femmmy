@@ -1,10 +1,11 @@
 import { AppBar } from "@/components/app-bar";
 import { Button } from "@/components/button";
+import { SansText } from "@/components/text";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -37,42 +38,42 @@ export default function SettingsScreen() {
             <TouchableOpacity className="p-2" onPress={() => router.back()}>
               <ChevronLeft size={24} color="#374151" />
             </TouchableOpacity>
-            <Text className="text-xl font-medium">Settings</Text>
+            <SansText className="text-xl">Settings</SansText>
           </View>
         }
       />
 
       <View className="p-4">
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Data</Text>
+          <SansText style={styles.sectionTitle}>Data</SansText>
           <View style={styles.card}>
             <View style={styles.row}>
-              <Text style={styles.label}>Logged Cycles</Text>
-              <Text style={styles.value}>{cycles.length}</Text>
+              <SansText style={styles.label}>Logged Cycles</SansText>
+              <SansText style={styles.value}>{cycles.length}</SansText>
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Danger Zone</Text>
+          <SansText style={styles.sectionTitle}>Danger Zone</SansText>
           <View style={styles.card}>
             <Button
               title="Clear All Data"
               onPress={handleClearData}
               variant="danger"
             />
-            <Text style={styles.warningText}>
+            <SansText style={styles.warningText}>
               This will permanently delete all your cycle history and
               predictions.
-            </Text>
+            </SansText>
           </View>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Femmmy v1.0.0</Text>
-          <Text style={styles.footerSubtext}>
+          <SansText style={styles.footerText}>Femmmy v1.0.0</SansText>
+          <SansText style={styles.footerSubtext}>
             Your data stays on your device
-          </Text>
+          </SansText>
         </View>
       </View>
     </View>

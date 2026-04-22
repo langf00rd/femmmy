@@ -6,6 +6,9 @@ module.exports = {
     extend: {
       colors: require('./lib/theme').colors,
     },
+    fontFamily: {
+      sans: ["DM_Sans"],
+    },
   },
   plugins: [],
 }
