@@ -24,12 +24,6 @@ export default function Timeline() {
           </View>
         }
       />
-      {/*<View className="pt-12 pb-3 px-4 flex-row items-center border-b border-neutral-100">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ChevronLeft size={24} color="#374151" />
-        </TouchableOpacity>
-        <Text className="ml-3 text-xl font-semibold"></Text>
-      </View>*/}
       <ScrollView>
         <Calendar
           cycles={cycles}

@@ -5,6 +5,7 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { CycleProvider } from "@/context/cycle";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -12,14 +13,17 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <CycleProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="timeline" />
-        </Stack>
-        <StatusBar style="dark" />
-      </CycleProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={DefaultTheme}>
+        <CycleProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="timeline" />
+          </Stack>
+          <StatusBar style="dark" />
+        </CycleProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
