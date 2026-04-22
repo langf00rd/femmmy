@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  useColorScheme,
   Alert,
   ScrollView,
   Platform,
@@ -27,8 +26,7 @@ const SYMPTOM_OPTIONS = [
 
 export default function LogPeriodScreen() {
   const { cycles, addCycle } = useCycles();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const colors = Colors.light;
 
   const today = startOfDay(new Date());
   const todayStr = format(today, 'yyyy-MM-dd');

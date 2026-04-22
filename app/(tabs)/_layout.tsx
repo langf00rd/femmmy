@@ -1,20 +1,19 @@
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Tabs } from "expo-router";
 import { ChartLine, Heart, PlusCircle, Settings } from "lucide-react-native";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].tabIconDefault,
+        // tabBarActiveTintColor: Colors.light.tint,
+        // tabBarInactiveTintColor: Colors.light.tabIconDefault,
         // tabBarShowLabel: false,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? "light"].background,
+          backgroundColor: "white",
+          // borderTopWidth: 1,
+          // borderTopColor: "#cccccc66",
+          // backgroundColor: Colors[colorScheme ?? "light"].background,
           elevation: 0,
           // margin: 10,
           height: 80,

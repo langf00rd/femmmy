@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, useColorScheme } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { useCycles } from '@/context/CycleContext';
 import {
@@ -20,8 +20,7 @@ function StatCard({
   unit?: string;
   color: string;
 }) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const colors = Colors.light;
 
   return (
     <View style={[styles.statCard, { backgroundColor: colors.background }]}>
@@ -43,8 +42,7 @@ function PredictionCard({
   endDate?: Date;
   color: string;
 }) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const colors = Colors.light;
 
   return (
     <View style={[styles.predictionCard, { backgroundColor: colors.background }]}>
@@ -63,8 +61,7 @@ function PredictionCard({
 
 export default function InsightsScreen() {
   const { cycles } = useCycles();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const colors = Colors.light;
 
   const avgCycleLength = calculateAverageCycleLength(cycles);
   const avgPeriodDuration = calculateAveragePeriodDuration(cycles);

@@ -1,83 +1,10 @@
-import { Calendar } from "@/components/Calendar";
-import { Colors } from "@/constants/theme";
+import { Calendar } from "@/components/calendar";
 import { useCycles } from "@/context/CycleContext";
-import {
-  getCurrentCycleDay,
-  getDaysUntilNextPeriod,
-  getPredictionData,
-} from "@/lib/predictions";
-import { format } from "date-fns";
-import { CalendarMinus, FlameIcon } from "lucide-react-native";
-import React, { useMemo, useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from "react-native";
-
-function StatsOverview() {
-  const { cycles } = useCycles();
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === "dark" ? "dark" : "light"];
-
-  const cycleDay = getCurrentCycleDay(cycles);
-  const daysUntil = getDaysUntilNextPeriod(cycles);
-  const predictions = cycles.length > 0 ? getPredictionData(cycles) : null;
-
-  return (
-    <View style={styles.statsContainer}>
-      <View style={styles.statsRow}>
-        <View style={[styles.statCard, { backgroundColor: colors.background }]}>
-          <Text style={[styles.statValue, { color: colors.tint }]}>
-            {cycleDay}
-          </Text>
-          <Text style={[styles.statLabel, { color: colors.icon }]}>
-            Cycle Day
-          </Text>
-        </View>
-        <View style={[styles.statCard, { backgroundColor: colors.background }]}>
-          <Text style={[styles.statValue, { color: colors.tint }]}>
-            {daysUntil}
-          </Text>
-          <Text style={[styles.statLabel, { color: colors.icon }]}>
-            Days Until Period
-          </Text>
-        </View>
-      </View>
-      {predictions && (
-        <View style={styles.statsRow}>
-          <View
-            style={[styles.statCard, { backgroundColor: colors.background }]}
-          >
-            <Text style={[styles.statValue, { color: colors.success }]}>
-              {format(predictions.nextPeriodDate, "MMM d")}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.icon }]}>
-              Next Period
-            </Text>
-          </View>
-          <View
-            style={[styles.statCard, { backgroundColor: colors.background }]}
-          >
-            <Text style={[styles.statValue, { color: colors.warning }]}>
-              {format(predictions.ovulationDate, "MMM d")}
-            </Text>
-            <Text style={[styles.statLabel, { color: colors.icon }]}>
-              Ovulation
-            </Text>
-          </View>
-        </View>
-      )}
-    </View>
-  );
-}
+import { CalendarIcon, FlameIcon } from "lucide-react-native";
+import { useMemo, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === "dark" ? "dark" : "light"];
   const { cycles } = useCycles();
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -89,163 +16,26 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View
-          className="border"
-          style={{
-            backgroundColor: "#fff",
-            paddingTop: 50,
-          }}
-        >
-          <View
-            className="flex items-center justify-between"
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              paddingHorizontal: 15,
-            }}
-          >
-            <View
-              className="flex items-center border"
-              style={{
-                borderRadius: 99,
-                paddingHorizontal: 7,
-                paddingVertical: 3,
-                gap: 3,
-                flexDirection: "row",
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: colors.input,
-              }}
-            >
+    <View>
+      <ScrollView>
+        <View className="border-b border-b-neutral-200 bg-white pt-16">
+          <View className="mb-5 flex items-center justify-between flex-row px-4">
+            <View className="items-center border border-neutral-300 flex-row gap-2 px-2 py-1 rounded-full">
               <FlameIcon className="text-orange-500" color="orange" size={14} />
               <Text>18</Text>
             </View>
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: colors.text,
-                  textAlign: "center",
-                  marginBottom: 10,
-                },
-              ]}
-            >
-              {greeting}
-            </Text>
+            <Text className="text-3xl font-medium">{greeting}</Text>
             <TouchableOpacity>
-              <CalendarMinus />
+              <CalendarIcon className="hidden" />
             </TouchableOpacity>
           </View>
-          {/*<Text style={[styles.subtitle, { color: colors.icon }]}>
-            {cycles.length === 0
-              ? "Log your first period to get predictions"
-              : "Your cycle at a glance"}
-          </Text>*/}
           <Calendar
             cycles={cycles}
             currentMonth={currentMonth}
             onMonthChange={setCurrentMonth}
           />
         </View>
-        c<StatsOverview />
-        {/*<View style={styles.legendContainer}>
-          <Text style={[styles.legendTitle, { color: colors.text }]}>
-            Legend
-          </Text>
-          <View style={styles.legendRow}>
-            <View
-              style={[styles.legendDot, { backgroundColor: colors.period }]}
-            />
-            <Text style={[styles.legendText, { color: colors.icon }]}>
-              Period
-            </Text>
-            <View
-              style={[styles.legendDot, { backgroundColor: colors.fertile }]}
-            />
-            <Text style={[styles.legendText, { color: colors.icon }]}>
-              Fertile
-            </Text>
-            <View
-              style={[styles.legendDot, { backgroundColor: colors.success }]}
-            />
-            <Text style={[styles.legendText, { color: colors.icon }]}>
-              Predicted
-            </Text>
-            <View
-              style={[styles.legendDot, { backgroundColor: colors.warning }]}
-            />
-            <Text style={[styles.legendText, { color: colors.icon }]}>
-              Ovulation
-            </Text>
-          </View>
-        </View>*/}
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    // padding: 16,
-    // paddingTop: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 16,
-    marginTop: 4,
-    marginBottom: 16,
-  },
-  statsContainer: {
-    marginTop: 24,
-    gap: 12,
-  },
-  statsRow: {
-    flexDirection: "row",
-    gap: 12,
-  },
-  statCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  statLabel: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  legendContainer: {
-    marginTop: 24,
-    padding: 16,
-  },
-  legendTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  legendRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  legendText: {
-    fontSize: 12,
-  },
-});
