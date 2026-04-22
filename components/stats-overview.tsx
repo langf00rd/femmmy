@@ -31,7 +31,7 @@ function StatCard({
       </SansText>
       <View className="flex-row items-end w-full justify-end">
         <SansText
-          className={`text-[4rem] tracking-tight leading-[0.8]`}
+          className={`text-[4rem] tracking-tight leading-[01]`}
           style={{
             fontWeight: 500,
             fontSize: isDateValue ? 24 : 40,
@@ -40,7 +40,9 @@ function StatCard({
           {isDateValue ? format(value, "MMM d, yyyy") : String(value)}
         </SansText>
         {unit && (
-          <SansText className="text-sm ml-1 text-neutral-400">{unit}</SansText>
+          <SansText className="text-sm ml-1 text-neutral-400 relative -top-1">
+            {unit}
+          </SansText>
         )}
       </View>
     </View>
