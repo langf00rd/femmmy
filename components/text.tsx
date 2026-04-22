@@ -40,7 +40,7 @@ function resolveFont(weight?: TextProps["style"], italic?: boolean): AppFonts {
 }
 
 interface SansTextProps extends Omit<TextProps, "style"> {
-  style?: Omit<TextProps["style"] & object, "fontFamily">;
+  style?: TextProps["style"];
 }
 
 export function SansText({ style, ...props }: SansTextProps) {

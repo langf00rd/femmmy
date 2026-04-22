@@ -12,7 +12,7 @@ import {
 } from "date-fns";
 import React, { useMemo } from "react";
 import { SansText } from "./text";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
