@@ -163,17 +163,13 @@ export function StatsOverview() {
       <SectionTitle>Summary</SectionTitle>
       <View className="bg-white rounded-md p-5 shadow-sm shadow-neutral-100 border border-neutral-200/80 gap-2">
         <View className="flex-row items-center justify-between">
-          <SansText className="text-sm text-neutral-400">
-            Cycles logged
-          </SansText>
-          <SansText className="text-sm text-neutral-700">
-            {cycles.length}
-          </SansText>
+          <SansText className="text-neutral-400">Cycles logged</SansText>
+          <SansText className="text-neutral-700">{cycles.length}</SansText>
         </View>
         <View className="h-px bg-neutral-100" />
         <View className="flex-row items-center justify-between">
-          <SansText className="text-sm text-neutral-400">Based on</SansText>
-          <SansText className="text-sm text-neutral-700">
+          <SansText className="text-neutral-400">Based on</SansText>
+          <SansText className="text-neutral-700">
             {Math.min(cycles.length, 6)} most recent cycle
             {Math.min(cycles.length, 6) !== 1 ? "s" : ""}
           </SansText>
