@@ -1,5 +1,5 @@
 import { AppBar } from "@/components/app-bar";
-import { Calendar } from "@/components/calendar";
+import { Calendar } from "@/components/Calendar";
 import { SansText } from "@/components/text";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
