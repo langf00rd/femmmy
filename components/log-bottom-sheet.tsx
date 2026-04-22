@@ -70,17 +70,10 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
       setIsSubmitting(true);
       try {
         await addCycle(startDate, endDate, selectedSymptoms);
-        Alert.alert("Success", "Period logged successfully!", [
-          {
-            text: "OK",
-            onPress: () => {
-              setStartDate(todayStr);
-              setEndDate(todayStr);
-              setSelectedSymptoms([]);
-              onClose?.();
-            },
-          },
-        ]);
+        setStartDate(todayStr);
+        setEndDate(todayStr);
+        setSelectedSymptoms([]);
+        onClose?.();
       } catch {
         Alert.alert("Error", "Failed to save period");
       } finally {
@@ -176,7 +169,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                   return (
                     <TouchableOpacity
                       key={symptom}
-                      className={`p-1 rounded-full pb-[6px] px-4 border`}
+                      className={`p-1 rounded-full pb-[4px] px-4 border`}
                       onPress={() => toggleSymptom(symptom)}
                       style={{
                         borderColor: isSelected ? "#000" : COLORS.input,

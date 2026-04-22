@@ -116,7 +116,7 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
     : isFertileHighlighted
       ? "text-emerald-700"
       : "text-neutral-800";
-  const todayUnderline = today ? "border-b-2 border-rose-400" : "";
+  const todayUnderline = today ? "border-b-[1px] border-rose-400" : "";
 
   return (
     <View className="w-12 items-center mx-1">
