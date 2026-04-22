@@ -120,12 +120,12 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
 
   return (
     <View className="w-12 items-center mx-1">
-      <SansText className="text-[10px] text-neutral-400 mb-1">
+      <SansText className="text-[10px] text-neutral-400 mb-2">
         {format(date, "EEE")}
       </SansText>
       <View
         className={[
-          "w-10 h-10 rounded-full items-center justify-center border",
+          "size-10 rounded-full flex-row items-center justify-center border",
           pillBg,
           pillBorder,
           todayUnderline,

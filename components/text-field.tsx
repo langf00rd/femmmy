@@ -4,7 +4,7 @@ export default function TextField({ ...props }) {
   return (
     <TextInput
       {...props}
-      className={`border border-neutral-200 px-4 rounded-md shadow-sm bg-white ${props.className}`}
+      className={`border border-neutral-200 px-4 rounded-md shadow-xs bg-white ${props.className}`}
       style={{
         ...props.style,
         fontFamily: "DMSans",
