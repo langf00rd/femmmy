@@ -1,10 +1,3 @@
-// import { useCycles } from "@/context/cycle";
-// import {
-//   calculateAverageCycleLength,
-//   calculateAveragePeriodDuration,
-//   getPredictionData,
-// } from "@/lib/predictions";
-// import { format } from "date-fns";
 import React from "react";
 import { ScrollView, Text } from "react-native";
 
