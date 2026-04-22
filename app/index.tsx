@@ -3,6 +3,7 @@ import { DayPicker } from "@/components/day-picker";
 import { LogBottomSheet } from "@/components/log-bottom-sheet";
 import { StatsOverview } from "@/components/stats-overview";
 import { useCycles } from "@/context/cycle";
+import { COLORS } from "@/lib/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
@@ -32,7 +33,12 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      className="flex-1"
+      style={{
+        backgroundColor: COLORS.background,
+      }}
+    >
       <AppBar
         className="pl-4"
         title={greeting}
@@ -49,8 +55,12 @@ export default function HomeScreen() {
       />
       <DayPicker cycles={cycles} />
       <StatsOverview />
-      <TouchableOpacity style={styles.fab} onPress={handleOpenBottomSheet}>
-        <Plus size={24} color="white" />
+      <TouchableOpacity
+        style={{ backgroundColor: COLORS.primary }}
+        className="absolute size-14 p-2 bottom-10 right-4 rounded-full flex-row items-center justify-center"
+        onPress={handleOpenBottomSheet}
+      >
+        <Plus size={20} color="white" />
       </TouchableOpacity>
       <LogBottomSheet ref={bottomSheetRef} onClose={handleCloseBottomSheet} />
     </View>

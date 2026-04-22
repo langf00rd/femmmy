@@ -99,8 +99,10 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
         ref={ref}
         index={-1}
         // snapPoints={snapPoints}
-        // enablePanDownToClose
-        // backgroundStyle={styles.background}
+        enablePanDownToClose
+        backgroundStyle={{
+          backgroundColor: COLORS.background,
+        }}
         handleIndicatorStyle={styles.handleIndicator}
         backdropComponent={(props) => (
           <BottomSheetBackdrop
@@ -111,10 +113,30 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
           />
         )}
       >
-        <BottomSheetView style={styles.container}>
+        <BottomSheetView
+          className="flex-1"
+          style={{
+            backgroundColor: COLORS.background,
+          }}
+        >
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View className="mb-10">
-              <View className="flex-row gap-4">
+              <Text className="text-[1.5rem] font-medium mb-1.5">
+                Log your period
+              </Text>
+              <Text
+                className="text-[15.5px] leading-6"
+                style={{
+                  color: COLORS.mutedForeground,
+                }}
+              >
+                Tell us about your period so we can help you better track your
+                cycle
+              </Text>
+            </View>
+
+            <View className="mb-10">
+              <View className="flex-row gap-2">
                 <View className="flex-1">
                   <Label>Start Date</Label>
                   <TextField
@@ -137,14 +159,14 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                 </View>
               </View>
               {periodDuration() > 0 && (
-                <Text style={styles.helperText}>
+                <Text className="mt-2 text-neutral-400">
                   Duration: {periodDuration()} day
                   {periodDuration() > 1 ? "s" : ""}
                 </Text>
               )}
             </View>
 
-            <View className="mb-10">
+            <View className="mb-20">
               <Label>Symptoms (optional)</Label>
               <View style={styles.symptomsGrid}>
                 {SYMPTOM_OPTIONS.map((symptom) => {
@@ -155,16 +177,14 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                       className={`p-1 rounded-full pb-[6px] px-4 border`}
                       onPress={() => toggleSymptom(symptom)}
                       style={{
-                        borderColor: isSelected ? COLORS.primary : COLORS.input,
-                        backgroundColor: isSelected
-                          ? COLORS.primary
-                          : undefined,
+                        borderColor: isSelected ? "#000" : COLORS.input,
+                        backgroundColor: isSelected ? "#000" : undefined,
                       }}
                     >
                       <Text
-                        style={{
-                          color: isSelected ? "#fff" : "#000",
-                        }}
+                        className={
+                          isSelected ? "text-white" : "text-neutral-500"
+                        }
                       >
                         {symptom}
                       </Text>
@@ -175,7 +195,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
             </View>
 
             <Button
-              title={isSubmitting ? "Saving..." : "Save Period"}
+              title={isSubmitting ? "Saving..." : "Save"}
               onPress={handleSave}
               disabled={isSubmitting}
               loading={isSubmitting}
