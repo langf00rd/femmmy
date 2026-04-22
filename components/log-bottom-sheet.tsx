@@ -121,13 +121,13 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <View className="mb-10">
               <SansText
-                className="text-[1.5rem] mb-1.5"
+                className="text-[1.3rem] mb-1.5"
                 style={{ fontWeight: 500 }}
               >
                 Log your period
               </SansText>
               <SansText
-                className="text-[15.5px] leading-6"
+                className="leading-6"
                 style={{
                   color: COLORS.mutedForeground,
                 }}

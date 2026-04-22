@@ -44,5 +44,5 @@ export function useLocalFont() {
     DMSans_900Black_Italic,
   });
 
-  console.log("[FONT LOADED]", fontsLoaded);
+  return fontsLoaded;
 }

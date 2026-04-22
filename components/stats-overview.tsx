@@ -14,58 +14,67 @@ function StatCard({
   label,
   value,
   unit,
-  accent,
+  isDateValue = false,
 }: {
   label: string;
-  value: string;
+  value: string | Date;
   unit?: string;
-  accent: string;
+  isDateValue?: boolean;
 }) {
   return (
-    <View className="flex-1 bg-white rounded-md p-5 items-center shadow-sm shadow-neutral-100 border border-neutral-50">
-      <SansText className={`text-4xl tracking-tight ${accent}`}>
-        {value}
-      </SansText>
-      {unit && (
-        <SansText className="text-xs text-neutral-400 mt-1">{unit}</SansText>
-      )}
-      <SansText className="text-xs text-neutral-500 text-center mt-3 leading-4">
+    <View className="flex-1 bg-white p-5 rounded-md items-center shadow-sm shadow-neutral-100 border border-neutral-200/80">
+      <SansText
+        className="text-left w-full text-neutral-500 mb-5"
+        style={{ fontWeight: 500 }}
+      >
         {label}
       </SansText>
+      <View className="flex-row items-end w-full justify-end">
+        <SansText
+          className={`text-[4rem] tracking-tight leading-[0.8]`}
+          style={{
+            fontWeight: 500,
+            fontSize: isDateValue ? 24 : 40,
+          }}
+        >
+          {isDateValue ? format(value, "MMM d, yyyy") : String(value)}
+        </SansText>
+        {unit && (
+          <SansText className="text-sm ml-1 text-neutral-400">{unit}</SansText>
+        )}
+      </View>
     </View>
   );
 }
 
-function PredictionCard({
-  label,
-  startDate,
-  endDate,
-  accent,
-}: {
-  label: string;
-  startDate: Date;
-  endDate?: Date;
-  accent: string;
-}) {
-  return (
-    <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100">
-      <SansText className="text-neutral-400 text-sm uppercase mb-3">
-        {label}
-      </SansText>
-      <SansText
-        className={`text-2xl tracking-tight ${accent}`}
-        style={{ fontWeight: 500 }}
-      >
-        {format(startDate, "MMM d, yyyy")}
-      </SansText>
-      {endDate && (
-        <SansText className="text-sm text-neutral-400 mt-1">
-          → {format(endDate, "MMM d")}
-        </SansText>
-      )}
-    </View>
-  );
-}
+// function PredictionCard({
+//   label,
+//   startDate,
+//   endDate,
+//   // accent,
+// }: {
+//   label: string;
+//   startDate: Date;
+//   endDate?: Date;
+//   // accent: string;
+// }) {
+//   return (
+//     <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100">
+//       <SansText className="text-neutral-400 text-sm mb-3">{label}</SansText>
+//       <SansText
+//         className={`text-2xl tracking-tight`}
+//         style={{ fontWeight: 500 }}
+//       >
+//         {format(startDate, "MMM d, yyyy")}
+//       </SansText>
+//       {endDate && (
+//         <SansText className="text-sm text-neutral-400 mt-1">
+//           → {format(endDate, "MMM d")}
+//         </SansText>
+//       )}
+//     </View>
+//   );
+// }
 
 function SectionTitle({ children }: { children: string }) {
   return (
@@ -112,16 +121,16 @@ export function StatsOverview() {
       <SectionTitle>Averages</SectionTitle>
       <View className="flex-row gap-3">
         <StatCard
-          label="Avg Cycle Length"
+          label="Cycle Length (Avg.)"
           value={String(avgCycleLength)}
           unit="days"
-          accent="text-rose-500"
+          // accent="text-rose-500"
         />
         <StatCard
-          label="Avg Period Duration"
+          label="Period Duration (Avg.)"
           value={String(avgPeriodDuration)}
           unit="days"
-          accent="text-rose-400"
+          // accent="text-rose-400"
         />
       </View>
 
@@ -129,28 +138,28 @@ export function StatsOverview() {
         <>
           <SectionTitle>Predictions</SectionTitle>
           <View className="gap-3">
-            <PredictionCard
-              label="Next Period"
-              startDate={predictions.nextPeriodDate}
-              accent="text-rose-500"
+            <StatCard
+              isDateValue
+              label="🩸 Next Period"
+              value={predictions.nextPeriodDate}
             />
-            <PredictionCard
-              label="Ovulation Day"
-              startDate={predictions.ovulationDate}
-              accent="text-amber-500"
+            <StatCard
+              isDateValue
+              label="⛳ Ovulation Day"
+              value={predictions.ovulationDate}
             />
-            <PredictionCard
-              label="Fertile Window"
-              startDate={predictions.fertileWindowStart}
-              endDate={predictions.fertileWindowEnd}
-              accent="text-violet-500"
+            <StatCard
+              isDateValue
+              label="🌱 Fertile Window"
+              value={predictions.fertileWindowStart}
+              // endDate={predictions.fertileWindowEnd}
             />
           </View>
         </>
       )}
 
       <SectionTitle>Summary</SectionTitle>
-      <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100 gap-2">
+      <View className="bg-white rounded-md p-5 shadow-sm shadow-neutral-100 border border-neutral-200/80 gap-2">
         <View className="flex-row items-center justify-between">
           <SansText className="text-sm text-neutral-400">
             Cycles logged

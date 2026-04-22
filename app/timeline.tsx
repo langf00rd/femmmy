@@ -3,7 +3,7 @@ import { Calendar } from "@/components/calendar";
 import { SansText } from "@/components/text";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
+import { XIcon } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -19,7 +19,7 @@ export default function Timeline() {
         leading={
           <View className="flex-row items-center gap-5">
             <TouchableOpacity className="p-2" onPress={() => router.back()}>
-              <ChevronLeft size={24} color="#374151" />
+              <XIcon size={26} />
             </TouchableOpacity>
             <SansText className="text-xl">Timeline</SansText>
           </View>

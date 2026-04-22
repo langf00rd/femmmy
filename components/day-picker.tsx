@@ -150,7 +150,7 @@ export function DayPicker({ cycles }: DayPickerProps) {
   const predictedDates = useMemo(() => getPredictedDates(cycles), [cycles]);
 
   return (
-    <View className="bg-white border-b border-b-neutral-100 py-3">
+    <View className="bg-white border-b border-neutral-200/80 py-3">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
