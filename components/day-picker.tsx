@@ -1,10 +1,5 @@
 import type { CycleEntry } from "@/lib/types";
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isToday,
-} from "date-fns";
+import { eachDayOfInterval, endOfMonth, format, isToday } from "date-fns";
 import { useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 

@@ -1,4 +1,5 @@
 import { useCycles } from "@/context/cycle";
+import { COLORS } from "@/lib/theme";
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetView,
@@ -10,11 +11,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Button } from "./button";
+import Label from "./label";
+import TextField from "./text-field";
 
 const SYMPTOM_OPTIONS = [
   "Cramps",
@@ -96,9 +98,9 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
       <BottomSheet
         ref={ref}
         index={-1}
-        snapPoints={snapPoints}
-        enablePanDownToClose
-        backgroundStyle={styles.background}
+        // snapPoints={snapPoints}
+        // enablePanDownToClose
+        // backgroundStyle={styles.background}
         handleIndicatorStyle={styles.handleIndicator}
         backdropComponent={(props) => (
           <BottomSheetBackdrop
@@ -111,33 +113,29 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
       >
         <BottomSheetView style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <Text style={styles.title}>Log Period</Text>
-            <Text style={styles.subtitle}>
-              Record your menstrual cycle data
-            </Text>
-
-            <View style={styles.formSection}>
-              <Text style={styles.label}>Start Date</Text>
-              <TextInput
-                style={styles.input}
-                value={startDate}
-                onChangeText={setStartDate}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9ca3af"
-                keyboardType="numbers-and-punctuation"
-              />
-            </View>
-
-            <View style={styles.formSection}>
-              <Text style={styles.label}>End Date</Text>
-              <TextInput
-                style={styles.input}
-                value={endDate}
-                onChangeText={setEndDate}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9ca3af"
-                keyboardType="numbers-and-punctuation"
-              />
+            <View className="mb-10">
+              <View className="flex-row gap-4">
+                <View className="flex-1">
+                  <Label>Start Date</Label>
+                  <TextField
+                    value={startDate}
+                    onChangeText={setStartDate}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="numbers-and-punctuation"
+                  />
+                </View>
+                <View className="flex-1">
+                  <Label>End Date</Label>
+                  <TextField
+                    value={endDate}
+                    onChangeText={setEndDate}
+                    placeholder="YYYY-MM-DD"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="numbers-and-punctuation"
+                  />
+                </View>
+              </View>
               {periodDuration() > 0 && (
                 <Text style={styles.helperText}>
                   Duration: {periodDuration()} day
@@ -146,28 +144,27 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
               )}
             </View>
 
-            <View style={styles.formSection}>
-              <Text style={styles.label}>Symptoms (optional)</Text>
+            <View className="mb-10">
+              <Label>Symptoms (optional)</Label>
               <View style={styles.symptomsGrid}>
                 {SYMPTOM_OPTIONS.map((symptom) => {
                   const isSelected = selectedSymptoms.includes(symptom);
                   return (
                     <TouchableOpacity
                       key={symptom}
-                      style={[
-                        styles.symptomChip,
-                        {
-                          backgroundColor: isSelected ? "#dc2626" : "#fff",
-                          borderColor: isSelected ? "#dc2626" : "#fca5a5",
-                        },
-                      ]}
+                      className={`p-1 rounded-full pb-[6px] px-4 border`}
                       onPress={() => toggleSymptom(symptom)}
+                      style={{
+                        borderColor: isSelected ? COLORS.primary : COLORS.input,
+                        backgroundColor: isSelected
+                          ? COLORS.primary
+                          : undefined,
+                      }}
                     >
                       <Text
-                        style={[
-                          styles.symptomText,
-                          { color: isSelected ? "#fff" : "#dc2626" },
-                        ]}
+                        style={{
+                          color: isSelected ? "#fff" : "#000",
+                        }}
                       >
                         {symptom}
                       </Text>
@@ -184,7 +181,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
               loading={isSubmitting}
             />
 
-            {cycles.length > 0 && (
+            {/*{cycles.length > 0 && (
               <View style={styles.historySection}>
                 <Text style={styles.historyTitle}>Recent Entries</Text>
                 {cycles
@@ -207,7 +204,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
                     </View>
                   ))}
               </View>
-            )}
+            )}*/}
           </ScrollView>
         </BottomSheetView>
       </BottomSheet>
