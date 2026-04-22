@@ -5,7 +5,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
-import { forwardRef, useState } from "react";
+import { forwardRef, React, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -73,6 +73,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
         setStartDate(todayStr);
         setEndDate(todayStr);
         setSelectedSymptoms([]);
+        (ref as React.RefObject<BottomSheet>)?.current?.close();
         onClose?.();
       } catch {
         Alert.alert("Error", "Failed to save period");
