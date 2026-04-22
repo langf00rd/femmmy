@@ -13,6 +13,7 @@ export default function Timeline() {
   return (
     <View className="flex-1 bg-white">
       <AppBar
+        className="border-b border-b-neutral-200/20"
         action={<View />}
         leading={
           <View className="flex-row items-center gap-5">
