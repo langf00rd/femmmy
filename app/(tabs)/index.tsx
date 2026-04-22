@@ -1,13 +1,10 @@
-import { Calendar } from "@/components/calendar";
-import { useCycles } from "@/context/CycleContext";
+import { useRouter } from "expo-router";
 import { CalendarIcon, FlameIcon } from "lucide-react-native";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
-  const { cycles } = useCycles();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-
+  const router = useRouter();
   const greeting = useMemo(() => {
     const hour = new Date().getHours();
     if (hour >= 5 && hour < 12) return "good morning.";
@@ -25,15 +22,10 @@ export default function HomeScreen() {
               <Text>18</Text>
             </View>
             <Text className="text-3xl font-medium">{greeting}</Text>
-            <TouchableOpacity>
-              <CalendarIcon className="hidden" />
+            <TouchableOpacity onPress={() => router.push("/timeline")}>
+              <CalendarIcon />
             </TouchableOpacity>
           </View>
-          <Calendar
-            cycles={cycles}
-            currentMonth={currentMonth}
-            onMonthChange={setCurrentMonth}
-          />
         </View>
       </ScrollView>
     </View>

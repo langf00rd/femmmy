@@ -9,11 +9,9 @@ import {
   isToday,
   startOfMonth,
   startOfWeek,
-  subMonths,
 } from "date-fns";
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import React, { useMemo } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
 
 // ─── types ────────────────────────────────────────────────────────────────────
 
@@ -195,59 +193,40 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
 
 // ─── legend ───────────────────────────────────────────────────────────────────
 
-function Legend() {
-  const items = [
-    { color: "bg-rose-200", label: "Period" },
-    { color: "bg-emerald-200", label: "Fertile window" },
-  ] as const;
+// function Legend() {
+//   const items = [
+//     { color: "bg-rose-200", label: "Period" },
+//     { color: "bg-emerald-200", label: "Fertile window" },
+//   ] as const;
 
-  return (
-    <View className="flex-row flex-wrap gap-x-4 gap-y-2 px-1 pt-3 pb-1">
-      {items.map(({ color, label }) => (
-        <View key={label} className="flex-row items-center gap-x-1.5">
-          <View className={["w-2.5 h-2.5 rounded-full", color].join(" ")} />
-          <Text className="text-[11px] text-neutral-400 font-medium">
-            {label}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
-}
+//   return (
+//     <View className="flex-row flex-wrap gap-x-4 gap-y-2 px-1 pt-3 pb-1">
+//       {items.map(({ color, label }) => (
+//         <View key={label} className="flex-row items-center gap-x-1.5">
+//           <View className={["w-2.5 h-2.5 rounded-full", color].join(" ")} />
+//           <Text className="text-[11px] text-neutral-400 font-medium">
+//             {label}
+//           </Text>
+//         </View>
+//       ))}
+//     </View>
+//   );
+// }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function Calendar({
-  cycles,
-  currentMonth,
-  onMonthChange,
-}: CalendarProps) {
+export function Calendar({ cycles, currentMonth }: CalendarProps) {
   const monthGrid = useMemo(() => buildMonthGrid(currentMonth), [currentMonth]);
   const predictedDates = useMemo(() => getPredictedDates(cycles), [cycles]);
 
   return (
     <View className="bg-white">
-      <View className="flex-row items-center justify-between px-4 py-4 border-b border-neutral-100">
-        <TouchableOpacity
-          onPress={() => onMonthChange(subMonths(currentMonth, 1))}
-        >
-          <ChevronLeft size={18} color="#9ca3af" strokeWidth={2.5} />
-        </TouchableOpacity>
-
-        <Text className="font-semibold tracking-tight">
-          {format(currentMonth, "MMMM yyyy")}
-        </Text>
-
-        <TouchableOpacity
-          onPress={() => onMonthChange(addMonths(currentMonth, 1))}
-        >
-          <ChevronRight size={18} color="#9ca3af" strokeWidth={2.5} />
-        </TouchableOpacity>
-      </View>
-
       {monthGrid.map(({ month, weeks }) => (
-        <View key={month.getTime()} className="p-4 border-b border-neutral-100">
-          <Text className="text-sm font-semibold text-neutral-500 mb-2">
+        <View
+          key={month.getTime()}
+          className="py-4 border-b border-neutral-100"
+        >
+          <Text className="text-sm ml-4 font-medium text-neutral-400 mb-4">
             {format(month, "MMMM yyyy")}
           </Text>
 

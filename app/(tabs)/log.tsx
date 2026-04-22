@@ -1,35 +1,32 @@
-import React, { useState } from 'react';
+import { useCycles } from "@/context/cycle";
+import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
+import React, { useState } from "react";
 import {
-  View,
+  Alert,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  Platform,
-} from 'react-native';
-import { format, differenceInDays, parseISO, startOfDay } from 'date-fns';
-import { useCycles } from '@/context/CycleContext';
-import { Colors } from '@/constants/theme';
+  View,
+} from "react-native";
 
 const SYMPTOM_OPTIONS = [
-  'Cramps',
-  'Bloating',
-  'Fatigue',
-  'Headache',
-  'Mood swings',
-  'Breast tenderness',
-  'Acne',
-  'Back pain',
+  "Cramps",
+  "Bloating",
+  "Fatigue",
+  "Headache",
+  "Mood swings",
+  "Breast tenderness",
+  "Acne",
+  "Back pain",
 ];
 
 export default function LogPeriodScreen() {
   const { cycles, addCycle } = useCycles();
-  const colors = Colors.light;
 
   const today = startOfDay(new Date());
-  const todayStr = format(today, 'yyyy-MM-dd');
+  const todayStr = format(today, "yyyy-MM-dd");
 
   const [startDate, setStartDate] = useState(todayStr);
   const [endDate, setEndDate] = useState(todayStr);
@@ -40,13 +37,13 @@ export default function LogPeriodScreen() {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom]
+        : [...prev, symptom],
     );
   };
 
   const handleSave = async () => {
     if (!startDate || !endDate) {
-      Alert.alert('Error', 'Please select both start and end dates');
+      Alert.alert("Error", "Please select both start and end dates");
       return;
     }
 
@@ -54,16 +51,16 @@ export default function LogPeriodScreen() {
     const end = parseISO(endDate);
 
     if (end < start) {
-      Alert.alert('Error', 'End date must be on or after start date');
+      Alert.alert("Error", "End date must be on or after start date");
       return;
     }
 
     setIsSubmitting(true);
     try {
       await addCycle(startDate, endDate, selectedSymptoms);
-      Alert.alert('Success', 'Period logged successfully!', [
+      Alert.alert("Success", "Period logged successfully!", [
         {
-          text: 'OK',
+          text: "OK",
           onPress: () => {
             setStartDate(todayStr);
             setEndDate(todayStr);
@@ -72,7 +69,7 @@ export default function LogPeriodScreen() {
         },
       ]);
     } catch (error) {
-      Alert.alert('Error', 'Failed to save period');
+      Alert.alert("Error", "Failed to save period");
     } finally {
       setIsSubmitting(false);
     }
@@ -84,50 +81,56 @@ export default function LogPeriodScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={[styles.title, { color: colors.text }]}>Log Period</Text>
-        <Text style={[styles.subtitle, { color: colors.icon }]}>
-          Record your menstrual cycle data
-        </Text>
+        <Text style={[styles.title]}>Log Period</Text>
+        <Text style={[styles.subtitle]}>Record your menstrual cycle data</Text>
 
         <View style={styles.formSection}>
-          <Text style={[styles.label, { color: colors.text }]}>Start Date</Text>
+          <Text style={[styles.label]}>Start Date</Text>
           <TextInput
             style={[
               styles.input,
-              { backgroundColor: colors.background, borderColor: colors.icon, color: colors.text },
+              // {
+              //   backgroundColor: "red",
+              //   borderColor: "red",
+              //   color: "red",
+              // },
             ]}
             value={startDate}
             onChangeText={setStartDate}
             placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.icon}
+            placeholderTextColor={"red"}
             keyboardType="numbers-and-punctuation"
           />
         </View>
 
         <View style={styles.formSection}>
-          <Text style={[styles.label, { color: colors.text }]}>End Date</Text>
+          <Text style={[styles.label]}>End Date</Text>
           <TextInput
             style={[
               styles.input,
-              { backgroundColor: colors.background, borderColor: colors.icon, color: colors.text },
+              {
+                // backgroundColor: "red",
+                // borderColor: "red",
+                // color: "red",
+              },
             ]}
             value={endDate}
             onChangeText={setEndDate}
             placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.icon}
+            placeholderTextColor={"red"}
             keyboardType="numbers-and-punctuation"
           />
           {periodDuration() > 0 && (
-            <Text style={[styles.helperText, { color: colors.icon }]}>
-              Duration: {periodDuration()} day{periodDuration() > 1 ? 's' : ''}
+            <Text style={[styles.helperText]}>
+              Duration: {periodDuration()} day{periodDuration() > 1 ? "s" : ""}
             </Text>
           )}
         </View>
 
         <View style={styles.formSection}>
-          <Text style={[styles.label, { color: colors.text }]}>Symptoms (optional)</Text>
+          <Text style={[styles.label]}>Symptoms (optional)</Text>
           <View style={styles.symptomsGrid}>
             {SYMPTOM_OPTIONS.map((symptom) => {
               const isSelected = selectedSymptoms.includes(symptom);
@@ -137,8 +140,8 @@ export default function LogPeriodScreen() {
                   style={[
                     styles.symptomChip,
                     {
-                      backgroundColor: isSelected ? colors.tint : colors.background,
-                      borderColor: colors.tint,
+                      backgroundColor: isSelected ? "red" : "red",
+                      borderColor: "red",
                     },
                   ]}
                   onPress={() => toggleSymptom(symptom)}
@@ -146,7 +149,7 @@ export default function LogPeriodScreen() {
                   <Text
                     style={[
                       styles.symptomText,
-                      { color: isSelected ? '#fff' : colors.tint },
+                      { color: isSelected ? "#fff" : "red" },
                     ]}
                   >
                     {symptom}
@@ -158,42 +161,33 @@ export default function LogPeriodScreen() {
         </View>
 
         <TouchableOpacity
-          style={[
-            styles.saveButton,
-            { backgroundColor: colors.tint },
-            isSubmitting && styles.saveButtonDisabled,
-          ]}
+          style={[styles.saveButton, isSubmitting && styles.saveButtonDisabled]}
           onPress={handleSave}
           disabled={isSubmitting}
         >
           <Text style={styles.saveButtonText}>
-            {isSubmitting ? 'Saving...' : 'Save Period'}
+            {isSubmitting ? "Saving..." : "Save Period"}
           </Text>
         </TouchableOpacity>
 
         {cycles.length > 0 && (
           <View style={styles.historySection}>
-            <Text style={[styles.historyTitle, { color: colors.text }]}>
-              Recent Entries
-            </Text>
+            <Text style={[styles.historyTitle]}>Recent Entries</Text>
             {cycles
               .slice()
               .sort(
                 (a, b) =>
                   new Date(b.periodStartDate).getTime() -
-                  new Date(a.periodStartDate).getTime()
+                  new Date(a.periodStartDate).getTime(),
               )
               .slice(0, 5)
               .map((cycle) => (
-                <View
-                  key={cycle.id}
-                  style={[styles.historyItem, { borderColor: colors.icon }]}
-                >
-                  <Text style={[styles.historyDate, { color: colors.text }]}>
-                    {format(parseISO(cycle.periodStartDate), 'MMM d')} -{' '}
-                    {format(parseISO(cycle.periodEndDate), 'MMM d, yyyy')}
+                <View key={cycle.id} style={[styles.historyItem]}>
+                  <Text style={[styles.historyDate]}>
+                    {format(parseISO(cycle.periodStartDate), "MMM d")} -{" "}
+                    {format(parseISO(cycle.periodEndDate), "MMM d, yyyy")}
                   </Text>
-                  <Text style={[styles.historyMeta, { color: colors.icon }]}>
+                  <Text style={[styles.historyMeta]}>
                     Cycle length: {cycle.cycleLength} days
                   </Text>
                 </View>
@@ -215,7 +209,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   subtitle: {
     fontSize: 16,
@@ -227,7 +221,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   input: {
@@ -241,8 +235,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   symptomsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   symptomChip: {
@@ -253,28 +247,28 @@ const styles = StyleSheet.create({
   },
   symptomText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   saveButton: {
     padding: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   saveButtonDisabled: {
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   historySection: {
     marginTop: 32,
   },
   historyTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 12,
   },
   historyItem: {
@@ -283,7 +277,7 @@ const styles = StyleSheet.create({
   },
   historyDate: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   historyMeta: {
     fontSize: 12,

@@ -1,4 +1,4 @@
-import { useCycles } from "@/context/CycleContext";
+import { useCycles } from "@/context/cycle";
 import React from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 

@@ -1,19 +1,23 @@
+import { clearCycles, loadCycles, saveCycles } from "@/lib/storage";
+import type { CycleEntry } from "@/lib/types";
+import { differenceInDays, parseISO } from "date-fns";
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
+  useContext,
+  useEffect,
+  useState,
   type ReactNode,
-} from 'react';
-import { differenceInDays, parseISO, format } from 'date-fns';
-import type { CycleEntry } from '@/lib/types';
-import { loadCycles, saveCycles, clearCycles } from '@/lib/storage';
+} from "react";
 
 interface CycleContextValue {
   cycles: CycleEntry[];
   isLoading: boolean;
-  addCycle: (startDate: string, endDate: string, symptoms?: string[]) => Promise<void>;
+  addCycle: (
+    startDate: string,
+    endDate: string,
+    symptoms?: string[],
+  ) => Promise<void>;
   clearAllData: () => Promise<void>;
 }
 
@@ -45,7 +49,7 @@ export function CycleProvider({ children }: CycleProviderProps) {
       const sorted = [...newCycles].sort(
         (a, b) =>
           new Date(a.periodStartDate).getTime() -
-          new Date(b.periodStartDate).getTime()
+          new Date(b.periodStartDate).getTime(),
       );
 
       const lengths: number[] = [];
@@ -62,7 +66,7 @@ export function CycleProvider({ children }: CycleProviderProps) {
       const total = lengths.reduce((sum, l) => sum + l, 0);
       return Math.round(total / lengths.length);
     },
-    []
+    [],
   );
 
   const addCycle = useCallback(
@@ -80,12 +84,15 @@ export function CycleProvider({ children }: CycleProviderProps) {
 
       newCycle.cycleLength = avgLength;
 
-      const finalCycles = [...cycles.filter((c) => c.periodStartDate !== startDate), newCycle];
+      const finalCycles = [
+        ...cycles.filter((c) => c.periodStartDate !== startDate),
+        newCycle,
+      ];
 
       setCycles(finalCycles);
       await saveCycles(finalCycles);
     },
-    [cycles, recalculateCycleLength]
+    [cycles, recalculateCycleLength],
   );
 
   const clearAllData = useCallback(async () => {
@@ -108,7 +115,7 @@ export function CycleProvider({ children }: CycleProviderProps) {
 export function useCycles(): CycleContextValue {
   const context = useContext(CycleContext);
   if (!context) {
-    throw new Error('useCycles must be used within a CycleProvider');
+    throw new Error("useCycles must be used within a CycleProvider");
   }
   return context;
 }
