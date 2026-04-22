@@ -1,4 +1,9 @@
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { useCycles } from "@/context/cycle";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
 import { forwardRef, useMemo, useState } from "react";
 import {
   Alert,
@@ -9,8 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCycles } from "@/context/cycle";
-import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
 import { Button } from "./button";
 
 const SYMPTOM_OPTIONS = [
@@ -28,184 +31,191 @@ interface LogBottomSheetProps {
   onClose?: () => void;
 }
 
-export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(({ onClose }, ref) => {
-  const snapPoints = useMemo(() => ["90%"], []);
-  const { cycles, addCycle } = useCycles();
+export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
+  ({ onClose }, ref) => {
+    const snapPoints = useMemo(() => ["90%"], []);
+    const { cycles, addCycle } = useCycles();
 
-  const today = startOfDay(new Date());
-  const todayStr = format(today, "yyyy-MM-dd");
+    const today = startOfDay(new Date());
+    const todayStr = format(today, "yyyy-MM-dd");
 
-  const [startDate, setStartDate] = useState(todayStr);
-  const [endDate, setEndDate] = useState(todayStr);
-  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const [startDate, setStartDate] = useState(todayStr);
+    const [endDate, setEndDate] = useState(todayStr);
+    const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const toggleSymptom = (symptom: string) => {
-    setSelectedSymptoms((prev) =>
-      prev.includes(symptom)
-        ? prev.filter((s) => s !== symptom)
-        : [...prev, symptom],
-    );
-  };
+    const toggleSymptom = (symptom: string) => {
+      setSelectedSymptoms((prev) =>
+        prev.includes(symptom)
+          ? prev.filter((s) => s !== symptom)
+          : [...prev, symptom],
+      );
+    };
 
-  const handleSave = async () => {
-    if (!startDate || !endDate) {
-      Alert.alert("Error", "Please select both start and end dates");
-      return;
-    }
+    const handleSave = async () => {
+      if (!startDate || !endDate) {
+        Alert.alert("Error", "Please select both start and end dates");
+        return;
+      }
 
-    const start = parseISO(startDate);
-    const end = parseISO(endDate);
+      const start = parseISO(startDate);
+      const end = parseISO(endDate);
 
-    if (end < start) {
-      Alert.alert("Error", "End date must be on or after start date");
-      return;
-    }
+      if (end < start) {
+        Alert.alert("Error", "End date must be on or after start date");
+        return;
+      }
 
-    setIsSubmitting(true);
-    try {
-      await addCycle(startDate, endDate, selectedSymptoms);
-      Alert.alert("Success", "Period logged successfully!", [
-        {
-          text: "OK",
-          onPress: () => {
-            setStartDate(todayStr);
-            setEndDate(todayStr);
-            setSelectedSymptoms([]);
-            onClose?.();
+      setIsSubmitting(true);
+      try {
+        await addCycle(startDate, endDate, selectedSymptoms);
+        Alert.alert("Success", "Period logged successfully!", [
+          {
+            text: "OK",
+            onPress: () => {
+              setStartDate(todayStr);
+              setEndDate(todayStr);
+              setSelectedSymptoms([]);
+              onClose?.();
+            },
           },
-        },
-      ]);
-    } catch (error) {
-      Alert.alert("Error", "Failed to save period");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+        ]);
+      } catch {
+        Alert.alert("Error", "Failed to save period");
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
 
-  const periodDuration = () => {
-    if (!startDate || !endDate) return 0;
-    return differenceInDays(parseISO(endDate), parseISO(startDate)) + 1;
-  };
+    const periodDuration = () => {
+      if (!startDate || !endDate) return 0;
+      return differenceInDays(parseISO(endDate), parseISO(startDate)) + 1;
+    };
 
-  return (
-    <BottomSheet
-      ref={ref}
-      index={-1}
-      snapPoints={snapPoints}
-      enablePanDownToClose
-      backgroundStyle={styles.background}
-      handleIndicatorStyle={styles.handleIndicator}
-      backdropComponent={(props) => (
-        <BottomSheetBackdrop
-          {...props}
-          appearsOnIndex={0}
-          disappearsOnIndex={-1}
-          opacity={0.5}
-        />
-      )}
-    >
-      <BottomSheetView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <Text style={styles.title}>Log Period</Text>
-          <Text style={styles.subtitle}>Record your menstrual cycle data</Text>
-
-          <View style={styles.formSection}>
-            <Text style={styles.label}>Start Date</Text>
-            <TextInput
-              style={styles.input}
-              value={startDate}
-              onChangeText={setStartDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9ca3af"
-              keyboardType="numbers-and-punctuation"
-            />
-          </View>
-
-          <View style={styles.formSection}>
-            <Text style={styles.label}>End Date</Text>
-            <TextInput
-              style={styles.input}
-              value={endDate}
-              onChangeText={setEndDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor="#9ca3af"
-              keyboardType="numbers-and-punctuation"
-            />
-            {periodDuration() > 0 && (
-              <Text style={styles.helperText}>
-                Duration: {periodDuration()} day{periodDuration() > 1 ? "s" : ""}
-              </Text>
-            )}
-          </View>
-
-          <View style={styles.formSection}>
-            <Text style={styles.label}>Symptoms (optional)</Text>
-            <View style={styles.symptomsGrid}>
-              {SYMPTOM_OPTIONS.map((symptom) => {
-                const isSelected = selectedSymptoms.includes(symptom);
-                return (
-                  <TouchableOpacity
-                    key={symptom}
-                    style={[
-                      styles.symptomChip,
-                      {
-                        backgroundColor: isSelected ? "#dc2626" : "#fff",
-                        borderColor: isSelected ? "#dc2626" : "#fca5a5",
-                      },
-                    ]}
-                    onPress={() => toggleSymptom(symptom)}
-                  >
-                    <Text
-                      style={[
-                        styles.symptomText,
-                        { color: isSelected ? "#fff" : "#dc2626" },
-                      ]}
-                    >
-                      {symptom}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          <Button
-            title={isSubmitting ? "Saving..." : "Save Period"}
-            onPress={handleSave}
-            disabled={isSubmitting}
-            loading={isSubmitting}
+    return (
+      <BottomSheet
+        ref={ref}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose
+        backgroundStyle={styles.background}
+        handleIndicatorStyle={styles.handleIndicator}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+            opacity={0.5}
           />
+        )}
+      >
+        <BottomSheetView style={styles.container}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <Text style={styles.title}>Log Period</Text>
+            <Text style={styles.subtitle}>
+              Record your menstrual cycle data
+            </Text>
 
-          {cycles.length > 0 && (
-            <View style={styles.historySection}>
-              <Text style={styles.historyTitle}>Recent Entries</Text>
-              {cycles
-                .slice()
-                .sort(
-                  (a, b) =>
-                    new Date(b.periodStartDate).getTime() -
-                    new Date(a.periodStartDate).getTime(),
-                )
-                .slice(0, 5)
-                .map((cycle) => (
-                  <View key={cycle.id} style={styles.historyItem}>
-                    <Text style={styles.historyDate}>
-                      {format(parseISO(cycle.periodStartDate), "MMM d")} -{" "}
-                      {format(parseISO(cycle.periodEndDate), "MMM d, yyyy")}
-                    </Text>
-                    <Text style={styles.historyMeta}>
-                      Cycle length: {cycle.cycleLength} days
-                    </Text>
-                  </View>
-                ))}
+            <View style={styles.formSection}>
+              <Text style={styles.label}>Start Date</Text>
+              <TextInput
+                style={styles.input}
+                value={startDate}
+                onChangeText={setStartDate}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor="#9ca3af"
+                keyboardType="numbers-and-punctuation"
+              />
             </View>
-          )}
-        </ScrollView>
-      </BottomSheetView>
-    </BottomSheet>
-  );
-});
+
+            <View style={styles.formSection}>
+              <Text style={styles.label}>End Date</Text>
+              <TextInput
+                style={styles.input}
+                value={endDate}
+                onChangeText={setEndDate}
+                placeholder="YYYY-MM-DD"
+                placeholderTextColor="#9ca3af"
+                keyboardType="numbers-and-punctuation"
+              />
+              {periodDuration() > 0 && (
+                <Text style={styles.helperText}>
+                  Duration: {periodDuration()} day
+                  {periodDuration() > 1 ? "s" : ""}
+                </Text>
+              )}
+            </View>
+
+            <View style={styles.formSection}>
+              <Text style={styles.label}>Symptoms (optional)</Text>
+              <View style={styles.symptomsGrid}>
+                {SYMPTOM_OPTIONS.map((symptom) => {
+                  const isSelected = selectedSymptoms.includes(symptom);
+                  return (
+                    <TouchableOpacity
+                      key={symptom}
+                      style={[
+                        styles.symptomChip,
+                        {
+                          backgroundColor: isSelected ? "#dc2626" : "#fff",
+                          borderColor: isSelected ? "#dc2626" : "#fca5a5",
+                        },
+                      ]}
+                      onPress={() => toggleSymptom(symptom)}
+                    >
+                      <Text
+                        style={[
+                          styles.symptomText,
+                          { color: isSelected ? "#fff" : "#dc2626" },
+                        ]}
+                      >
+                        {symptom}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+
+            <Button
+              title={isSubmitting ? "Saving..." : "Save Period"}
+              onPress={handleSave}
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            />
+
+            {cycles.length > 0 && (
+              <View style={styles.historySection}>
+                <Text style={styles.historyTitle}>Recent Entries</Text>
+                {cycles
+                  .slice()
+                  .sort(
+                    (a, b) =>
+                      new Date(b.periodStartDate).getTime() -
+                      new Date(a.periodStartDate).getTime(),
+                  )
+                  .slice(0, 5)
+                  .map((cycle) => (
+                    <View key={cycle.id} style={styles.historyItem}>
+                      <Text style={styles.historyDate}>
+                        {format(parseISO(cycle.periodStartDate), "MMM d")} -{" "}
+                        {format(parseISO(cycle.periodEndDate), "MMM d, yyyy")}
+                      </Text>
+                      <Text style={styles.historyMeta}>
+                        Cycle length: {cycle.cycleLength} days
+                      </Text>
+                    </View>
+                  ))}
+              </View>
+            )}
+          </ScrollView>
+        </BottomSheetView>
+      </BottomSheet>
+    );
+  },
+);
+
+LogBottomSheet.displayName = "LogBottomSheet";
 
 const styles = StyleSheet.create({
   background: {

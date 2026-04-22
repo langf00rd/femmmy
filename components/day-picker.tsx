@@ -3,7 +3,6 @@ import {
   eachDayOfInterval,
   endOfMonth,
   format,
-  isSameMonth,
   isToday,
 } from "date-fns";
 import { useMemo } from "react";
@@ -88,7 +87,6 @@ interface DayItemProps {
 
 function DayItem({ date, cycles, predictedDates }: DayItemProps) {
   const dateKey = format(date, "yyyy-MM-dd");
-  const isCurrentMonth = isSameMonth(date, new Date());
   const today = isToday(date);
 
   const inPeriod = cycles.some((cycle) => {

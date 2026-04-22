@@ -13,7 +13,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { cycles } = useCycles();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [, setSheetOpen] = useState(false);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();

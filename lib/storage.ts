@@ -1,11 +1,11 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import type { CycleEntry } from './types';
 
-const STORAGE_KEY = '@femmmy_cycles';
+const STORAGE_KEY = 'femmmy_cycles';
 
 export async function loadCycles(): Promise<CycleEntry[]> {
   try {
-    const json = await AsyncStorage.getItem(STORAGE_KEY);
+    const json = await SecureStore.getItemAsync(STORAGE_KEY);
     if (json) {
       return JSON.parse(json) as CycleEntry[];
     }
@@ -17,7 +17,7 @@ export async function loadCycles(): Promise<CycleEntry[]> {
 
 export async function saveCycles(cycles: CycleEntry[]): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cycles));
+    await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(cycles));
   } catch (error) {
     console.error('Failed to save cycles:', error);
   }
@@ -25,7 +25,7 @@ export async function saveCycles(cycles: CycleEntry[]): Promise<void> {
 
 export async function clearCycles(): Promise<void> {
   try {
-    await AsyncStorage.removeItem(STORAGE_KEY);
+    await SecureStore.deleteItemAsync(STORAGE_KEY);
   } catch (error) {
     console.error('Failed to clear cycles:', error);
   }
