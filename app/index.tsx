@@ -37,7 +37,6 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 " style={{ backgroundColor: COLORS.background }}>
       <AppBar
-        className="pl-4"
         title={greeting}
         action={
           <View className="flex-row gap-10">

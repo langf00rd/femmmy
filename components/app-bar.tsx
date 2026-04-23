@@ -12,7 +12,7 @@ export function AppBar(props: {
     <View
       className={`pt-10 flex-col h-[100px] bg-white justify-center ${props.className}`}
     >
-      <View className="flex items-center justify-between flex-row px-4 pl-0">
+      <View className="flex items-center justify-between flex-row px-4">
         {props.leading}
         <SansText className={`text-3xl ${props.titleClassName}`}>
           {props.title}
