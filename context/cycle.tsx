@@ -1,14 +1,24 @@
-import { clearCycles, loadCycles, saveCycles } from "@/lib/storage";
+import { supabase } from "@/lib/supabase";
 import type { CycleEntry } from "@/lib/types";
 import { differenceInDays, parseISO } from "date-fns";
-import React, {
+import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from "react";
+import { useAuth } from "./auth";
+
+export interface PeriodRecord {
+  id: string;
+  user_id: string;
+  start_dt: string;
+  end_dt: string;
+  symptoms: string[];
+  created_at: string;
+  updated_at: string;
+}
 
 interface CycleContextValue {
   cycles: CycleEntry[];
@@ -18,6 +28,7 @@ interface CycleContextValue {
     endDate: string,
     symptoms?: string[],
   ) => Promise<void>;
+  deleteCycle: (id: string) => Promise<void>;
   clearAllData: () => Promise<void>;
 }
 
@@ -28,17 +39,58 @@ interface CycleProviderProps {
 }
 
 export function CycleProvider({ children }: CycleProviderProps) {
+  const { user, getProfile } = useAuth();
   const [cycles, setCycles] = useState<CycleEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    async function init() {
-      const stored = await loadCycles();
-      setCycles(stored);
+  async function fetchPeriods() {
+    const user = await getProfile();
+    const { data, error } = await supabase
+      .from("periods")
+      .select("*")
+      .eq("user_id", user!.id)
+      .order("start_dt", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data;
+  }
+
+  const fetchCycles = useCallback(async () => {
+    if (!user) {
+      setCycles([]);
       setIsLoading(false);
+      return [];
     }
-    init();
-  }, []);
+
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from("periods")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("start_dt", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching cycles:", error);
+      setCycles([]);
+      setIsLoading(false);
+      return [];
+    } else if (data) {
+      const mapped = data.map((p: PeriodRecord) => ({
+        id: p.id,
+        periodStartDate: p.start_dt,
+        periodEndDate: p.end_dt,
+        symptoms: p.symptoms,
+      }));
+      setCycles(mapped);
+      setIsLoading(false);
+      return mapped;
+    }
+    setIsLoading(false);
+    return [];
+  }, [user]);
+
+  // useEffect(() => {
+  //   fetchCycles();
+  // }, [fetchCycles]);
 
   const recalculateCycleLength = useCallback(
     (newCycles: CycleEntry[]): number => {
@@ -69,42 +121,56 @@ export function CycleProvider({ children }: CycleProviderProps) {
     [],
   );
 
-  const addCycle = useCallback(
-    async (startDate: string, endDate: string, symptoms: string[] = []) => {
-      const newCycle: CycleEntry = {
-        id: `cycle_${Date.now()}`,
-        periodStartDate: startDate,
-        periodEndDate: endDate,
-        cycleLength: 28,
-        symptoms,
-      };
+  async function addPeriod(
+    startDate: string,
+    endDate: string,
+    symptoms: string[] = [],
+  ) {
+    const profile = await getProfile();
+    console.log("[addPeriod]", startDate, endDate, symptoms);
+    const { error } = await supabase.from("periods").insert({
+      user_id: profile?.id,
+      start_dt: new Date(startDate),
+      end_dt: new Date(endDate),
+      symptoms,
+    });
+    if (error) throw error;
+  }
 
-      const updatedCycles = [...cycles, newCycle];
-      const avgLength = recalculateCycleLength(updatedCycles);
+  const deleteCycle = useCallback(async (id: string) => {
+    const { error } = await supabase.from("periods").delete().eq("id", id);
 
-      newCycle.cycleLength = avgLength;
+    if (error) {
+      console.error("Error deleting cycle:", error);
+      throw error;
+    }
 
-      const finalCycles = [
-        ...cycles.filter((c) => c.periodStartDate !== startDate),
-        newCycle,
-      ];
-
-      setCycles(finalCycles);
-      await saveCycles(finalCycles);
-    },
-    [cycles, recalculateCycleLength],
-  );
+    setCycles((prev) => prev.filter((c) => c.id !== id));
+  }, []);
 
   const clearAllData = useCallback(async () => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("periods")
+      .delete()
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Error clearing cycles:", error);
+      throw error;
+    }
+
     setCycles([]);
-    await clearCycles();
-  }, []);
+  }, [user]);
 
   const value: CycleContextValue = {
     cycles,
     isLoading,
-    addCycle,
+    addPeriod,
+    deleteCycle,
     clearAllData,
+    fetchPeriods,
   };
 
   return (

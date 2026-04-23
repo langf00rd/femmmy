@@ -1,6 +1,7 @@
 import { AppBar } from "@/components/app-bar";
 import { Button } from "@/components/button";
 import { SansText } from "@/components/text";
+import { useAuth } from "@/context/auth";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
@@ -9,7 +10,22 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { signOut } = useAuth();
   const { cycles, clearAllData } = useCycles();
+
+  const handleLogout = async () => {
+    Alert.alert("Log Out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Log Out",
+        style: "destructive",
+        onPress: async () => {
+          await signOut();
+          router.replace("/auth/login");
+        },
+      },
+    ]);
+  };
 
   const handleClearData = () => {
     Alert.alert(
@@ -44,6 +60,13 @@ export default function SettingsScreen() {
       />
 
       <View className="p-4">
+        <View style={styles.section}>
+          <SansText style={styles.sectionTitle}>Account</SansText>
+          <View style={styles.card}>
+            <Button title="Log Out" onPress={handleLogout} variant="secondary" />
+          </View>
+        </View>
+
         <View style={styles.section}>
           <SansText style={styles.sectionTitle}>Data</SansText>
           <View style={styles.card}>

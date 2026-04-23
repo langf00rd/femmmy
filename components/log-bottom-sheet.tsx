@@ -1,4 +1,5 @@
 import { useCycles } from "@/context/cycle";
+import { PERIOD_SYMPTOMS } from "@/lib/content";
 import { COLORS } from "@/lib/theme";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -17,17 +18,6 @@ import { Button } from "./button";
 import Label from "./label";
 import { SansText } from "./text";
 import TextField from "./text-field";
-
-const SYMPTOM_OPTIONS = [
-  "Cramps",
-  "Bloating",
-  "Fatigue",
-  "Headache",
-  "Mood swings",
-  "Breast tenderness",
-  "Acne",
-  "Back pain",
-];
 
 interface LogBottomSheetProps {
   onClose?: () => void;
@@ -165,7 +155,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
             <View className="mb-20">
               <Label>Symptoms (optional)</Label>
               <View style={styles.symptomsGrid}>
-                {SYMPTOM_OPTIONS.map((symptom) => {
+                {PERIOD_SYMPTOMS.map((symptom) => {
                   const isSelected = selectedSymptoms.includes(symptom);
                   return (
                     <TouchableOpacity
