@@ -1,18 +1,11 @@
-import type { CycleEntry } from "@/lib/types";
-import {
-  calculateAverageCycleLength,
-  calculateAveragePeriodDuration,
-  getPredictionData,
-} from "@/lib/predictions";
-import { format } from "date-fns";
+import type { CycleOutput } from "@/lib/cycle-engine";
+import { format, parseISO } from "date-fns";
 import { ScrollView, View } from "react-native";
 import { SansText } from "./text";
 
 interface StatsOverviewProps {
-  cycles: CycleEntry[];
+  cycleData: CycleOutput;
 }
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function StatCard({
   label,
@@ -21,10 +14,28 @@ function StatCard({
   isDateValue = false,
 }: {
   label: string;
-  value: string | Date;
+  value: string | null;
   unit?: string;
   isDateValue?: boolean;
 }) {
+  if (!value) {
+    return (
+      <View className="flex-1 bg-white p-5 rounded-md items-center shadow-sm shadow-neutral-100 border border-neutral-200/80">
+        <SansText
+          className="text-left w-full text-neutral-500 mb-5"
+          style={{ fontWeight: 500 }}
+        >
+          {label}
+        </SansText>
+        <SansText className="text-neutral-400">—</SansText>
+      </View>
+    );
+  }
+
+  const displayValue = isDateValue
+    ? format(parseISO(value), "MMM d, yyyy")
+    : String(value);
+
   return (
     <View className="flex-1 bg-white p-5 rounded-md items-center shadow-sm shadow-neutral-100 border border-neutral-200/80">
       <SansText
@@ -41,7 +52,7 @@ function StatCard({
             fontSize: isDateValue ? 24 : 40,
           }}
         >
-          {isDateValue ? format(value, "MMM d, yyyy") : String(value)}
+          {displayValue}
         </SansText>
         {unit && (
           <SansText className="text-sm ml-1 text-neutral-400 relative -top-1">
@@ -52,35 +63,6 @@ function StatCard({
     </View>
   );
 }
-
-// function PredictionCard({
-//   label,
-//   startDate,
-//   endDate,
-//   // accent,
-// }: {
-//   label: string;
-//   startDate: Date;
-//   endDate?: Date;
-//   // accent: string;
-// }) {
-//   return (
-//     <View className="bg-white rounded-md p-5 border border-neutral-50 shadow-sm shadow-neutral-100">
-//       <SansText className="text-neutral-400 text-sm mb-3">{label}</SansText>
-//       <SansText
-//         className={`text-2xl tracking-tight`}
-//         style={{ fontWeight: 500 }}
-//       >
-//         {format(startDate, "MMM d, yyyy")}
-//       </SansText>
-//       {endDate && (
-//         <SansText className="text-sm text-neutral-400 mt-1">
-//           → {format(endDate, "MMM d")}
-//         </SansText>
-//       )}
-//     </View>
-//   );
-// }
 
 function SectionTitle({ children }: { children: string }) {
   return (
@@ -93,15 +75,10 @@ function SectionTitle({ children }: { children: string }) {
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+export function StatsOverview({ cycleData }: StatsOverviewProps) {
+  const hasData = cycleData && cycleData.calendar.length > 0;
 
-export function StatsOverview({ cycles }: StatsOverviewProps) {
-
-  const avgCycleLength = calculateAverageCycleLength(cycles);
-  const avgPeriodDuration = calculateAveragePeriodDuration(cycles);
-  const predictions = cycles.length > 0 ? getPredictionData(cycles) : null;
-
-  if (cycles.length === 0) {
+  if (!hasData) {
     return (
       <View className="flex-1 items-center justify-center px-8 -mt-20">
         <View className="w-14 h-14 rounded-full bg-rose-50 items-center justify-center mb-4">
@@ -127,54 +104,58 @@ export function StatsOverview({ cycles }: StatsOverviewProps) {
       <View className="flex-row gap-3">
         <StatCard
           label="Cycle Length (Avg.)"
-          value={String(avgCycleLength)}
+          value={String(cycleData.avgCycleLength)}
           unit="days"
-          // accent="text-rose-500"
         />
         <StatCard
           label="Period Duration (Avg.)"
-          value={String(avgPeriodDuration)}
+          value={String(cycleData.avgPeriodLength)}
           unit="days"
-          // accent="text-rose-400"
         />
       </View>
 
-      {predictions && (
-        <>
-          <SectionTitle>Predictions</SectionTitle>
-          <View className="gap-3">
-            <StatCard
-              isDateValue
-              label="🌱 Fertile Window"
-              value={predictions.fertileWindowStart}
-              // endDate={predictions.fertileWindowEnd}
-            />
-            <StatCard
-              isDateValue
-              label="⛳ Ovulation Day"
-              value={predictions.ovulationDate}
-            />
-            <StatCard
-              isDateValue
-              label="🩸 Next Period"
-              value={predictions.nextPeriodDate}
-            />
-          </View>
-        </>
-      )}
+      <SectionTitle>Predictions</SectionTitle>
+      <View className="gap-3">
+        <StatCard
+          isDateValue
+          label="🌱 Fertile Window"
+          value={cycleData.fertileWindowStart}
+        />
+        <StatCard
+          isDateValue
+          label="⛳ Ovulation Day"
+          value={cycleData.ovulation}
+        />
+        <StatCard
+          isDateValue
+          label="🩸 Next Period"
+          value={cycleData.nextPeriod}
+        />
+      </View>
 
       <SectionTitle>Summary</SectionTitle>
       <View className="bg-white rounded-md p-5 shadow-sm shadow-neutral-100 border border-neutral-200/80 gap-2">
+        {cycleData.isDelayed && (
+          <>
+            <View className="flex-row items-center justify-between">
+              <SansText className="text-amber-600">⚠️ Period is late</SansText>
+            </View>
+            <View className="h-px bg-neutral-100" />
+          </>
+        )}
         <View className="flex-row items-center justify-between">
-          <SansText className="text-neutral-400">Cycles logged</SansText>
-          <SansText className="text-neutral-700">{cycles.length}</SansText>
-        </View>
-        <View className="h-px bg-neutral-100" />
-        <View className="flex-row items-center justify-between">
-          <SansText className="text-neutral-400">Based on</SansText>
+          <SansText className="text-neutral-400">Current cycle day</SansText>
           <SansText className="text-neutral-700">
-            {Math.min(cycles.length, 6)} most recent cycle
-            {Math.min(cycles.length, 6) !== 1 ? "s" : ""}
+            {cycleData.anchor
+              ? Math.max(
+                  1,
+                  Math.floor(
+                    (new Date().getTime() -
+                      new Date(cycleData.anchor).getTime()) /
+                      (1000 * 60 * 60 * 24),
+                  ) + 1,
+                )
+              : "—"}
           </SansText>
         </View>
       </View>

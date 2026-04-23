@@ -1,6 +1,5 @@
-import type { CycleEntry } from "@/lib/types";
+import type { CycleOutput } from "@/lib/cycle-engine";
 import {
-  addDays,
   addMonths,
   endOfMonth,
   endOfWeek,
@@ -10,23 +9,27 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { SansText } from "./text";
 import { View } from "react-native";
 
-// ─── types ────────────────────────────────────────────────────────────────────
-
 interface CalendarProps {
-  cycles: CycleEntry[];
+  cycleData: CycleOutput;
   currentMonth: Date;
   onMonthChange: (month: Date) => void;
+  today: string;
 }
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
-
-const subDays = (date: Date, n: number) => addDays(date, -n);
-
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+
+const PHASE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
+  predicted_period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
+  ovulation: { bg: "bg-purple-100", text: "text-purple-700", border: "border-transparent" },
+  fertile: { bg: "bg-emerald-100", text: "text-emerald-700", border: "border-transparent" },
+  luteal: { bg: "bg-transparent", text: "text-neutral-800", border: "border-transparent" },
+  delay: { bg: "bg-amber-100", text: "text-amber-600", border: "border-transparent" },
+};
 
 function buildCalendarWeeks(currentMonth: Date): Date[][] {
   const monthStart = startOfMonth(currentMonth);
@@ -35,10 +38,10 @@ function buildCalendarWeeks(currentMonth: Date): Date[][] {
   const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
 
   const days: Date[] = [];
-  let cursor = calStart;
+  let cursor = new Date(calStart);
   while (cursor <= calEnd) {
-    days.push(cursor);
-    cursor = addDays(cursor, 1);
+    days.push(new Date(cursor));
+    cursor.setDate(cursor.getDate() + 1);
   }
 
   const weeks: Date[][] = [];
@@ -50,149 +53,36 @@ function buildMonthGrid(
   currentMonth: Date,
 ): { month: Date; weeks: Date[][] }[] {
   const months: { month: Date; weeks: Date[][] }[] = [];
-  for (let offset = -1; offset <= 10; offset++) {
+  for (let offset = 0; offset <= 2; offset++) {
     const month = addMonths(currentMonth, offset);
     months.push({ month, weeks: buildCalendarWeeks(month) });
   }
   return months;
 }
 
-const PREDICTED_FUTURE_CYCLES = 10;
-
-interface PredictedDates {
-  periodDates: Set<string>;
-  fertileDates: Set<string>;
-  ovulationDates: Set<string>;
-}
-
-function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
-  if (cycles.length === 0) {
-    return { periodDates: new Set(), fertileDates: new Set(), ovulationDates: new Set() };
-  }
-
-  const sorted = [...cycles].sort(
-    (a, b) =>
-      new Date(a.periodStartDate).getTime() -
-      new Date(b.periodStartDate).getTime(),
-  );
-
-  const avgLength = Math.round(
-    sorted.reduce((sum, c) => sum + c.cycleLength, 0) / sorted.length,
-  );
-  const avgDuration = Math.round(
-    sorted.reduce((sum, c) => {
-      const start = new Date(c.periodStartDate);
-      const end = new Date(c.periodEndDate);
-      return (
-        sum + (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24) + 1
-      );
-    }, 0) / sorted.length,
-  );
-
-  const lastCycle = sorted[sorted.length - 1];
-  const lastStart = new Date(lastCycle.periodStartDate);
-
-  const periodDates = new Set<string>();
-  const fertileDates = new Set<string>();
-  const ovulationDates = new Set<string>();
-
-  for (let i = 1; i <= PREDICTED_FUTURE_CYCLES; i++) {
-    const predictedStart = addDays(lastStart, avgLength * i);
-    const predictedEnd = addDays(predictedStart, avgDuration - 1);
-
-    for (
-      let d = 0;
-      d <= predictedEnd.getTime() - predictedStart.getTime();
-      d += 86400000
-    ) {
-      const periodDate = new Date(predictedStart.getTime() + d);
-      if (periodDate >= new Date()) {
-        periodDates.add(format(periodDate, "yyyy-MM-dd"));
-      }
-    }
-
-    const ovulationDate = subDays(predictedStart, 14);
-    if (ovulationDate >= new Date()) {
-      ovulationDates.add(format(ovulationDate, "yyyy-MM-dd"));
-      for (let d = -5; d <= 1; d++) {
-        const fertileDate = addDays(ovulationDate, d);
-        if (fertileDate >= new Date()) {
-          fertileDates.add(format(fertileDate, "yyyy-MM-dd"));
-        }
-      }
-    }
-  }
-
-  return { periodDates, fertileDates, ovulationDates };
-}
-
-// ─── sub-components ───────────────────────────────────────────────────────────
-
 interface DayCellProps {
   day: Date;
   currentMonth: Date;
-  cycles: CycleEntry[];
-  predictedDates: PredictedDates;
+  phase: string;
+  isToday: boolean;
 }
 
-function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
-  const today = isToday(day);
+function DayCell({ day, currentMonth, phase, isToday }: DayCellProps) {
   const isCurrentMonth = isSameMonth(day, currentMonth);
-  const dateKey = format(day, "yyyy-MM-dd");
-
-  const inPeriod = cycles.some((cycle) => {
-    const start = new Date(cycle.periodStartDate);
-    const end = new Date(cycle.periodEndDate);
-    const dayStr = format(day, "yyyy-MM-dd");
-    return (
-      dayStr >= format(start, "yyyy-MM-dd") &&
-      dayStr <= format(end, "yyyy-MM-dd")
-    );
-  });
-  const isPredictedPeriod =
-    !inPeriod && predictedDates.periodDates.has(dateKey);
-  const inFertileWindow = predictedDates.fertileDates.has(dateKey);
-  const isOvulation = predictedDates.ovulationDates.has(dateKey);
-
-  const isPeriodHighlighted = inPeriod || isPredictedPeriod;
-  const isFertileHighlighted = inFertileWindow && !isPeriodHighlighted;
-  const isOvulationDay = isOvulation && !isPeriodHighlighted;
-
-  const cellBg = isPeriodHighlighted
-    ? "bg-rose-100"
-    : isOvulationDay
-      ? "bg-purple-100"
-      : isFertileHighlighted
-        ? "bg-emerald-100"
-        : "bg-transparent";
-  const cellBorder = today
-    ? "border border-rose-400"
-    : isOvulationDay
-      ? "border border-purple-500"
-      : "border border-transparent";
-  const textColor = !isCurrentMonth
-    ? "text-neutral-300"
-    : isPeriodHighlighted
-      ? "text-rose-600"
-      : isOvulationDay
-        ? "text-purple-700"
-        : isFertileHighlighted
-          ? "text-emerald-700"
-          : "text-neutral-800";
-  const textWeight = today ? "" : "";
+  const colors = PHASE_COLORS[phase] ?? PHASE_COLORS.luteal;
 
   return (
     <View className="flex-1 aspect-square p-2">
       <View
         className={[
           "flex-1 items-center justify-center relative",
-          cellBg,
-          cellBorder,
+          colors.bg,
+          isToday ? "border-2 border-rose-400" : "border border-transparent",
           "rounded-full",
         ].join(" ")}
       >
         <SansText
-          className={["text-[13px] leading-none", textColor, textWeight].join(
+          className={["text-[13px] leading-none font-medium", isCurrentMonth ? colors.text : "text-neutral-300"].join(
             " ",
           )}
         >
@@ -203,33 +93,17 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
   );
 }
 
-// ─── legend ───────────────────────────────────────────────────────────────────
-
-// function Legend() {
-//   const items = [
-//     { color: "bg-rose-200", label: "Period" },
-//     { color: "bg-emerald-200", label: "Fertile window" },
-//   ] as const;
-
-//   return (
-//     <View className="flex-row flex-wrap gap-x-4 gap-y-2 px-1 pt-3 pb-1">
-//       {items.map(({ color, label }) => (
-//         <View key={label} className="flex-row items-center gap-x-1.5">
-//           <View className={["w-2.5 h-2.5 rounded-full", color].join(" ")} />
-//           <Text className="text-[11px] text-neutral-400">
-//             {label}
-//           </Text>
-//         </View>
-//       ))}
-//     </View>
-//   );
-// }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
-
-export function Calendar({ cycles, currentMonth }: CalendarProps) {
+export function Calendar({ cycleData, currentMonth, today }: CalendarProps) {
   const monthGrid = useMemo(() => buildMonthGrid(currentMonth), [currentMonth]);
-  const predictedDates = useMemo(() => getPredictedDates(cycles), [cycles]);
+
+  const phaseMap = useMemo(() => {
+    if (!cycleData?.calendar) return new Map<string, string>();
+    const map = new Map<string, string>();
+    for (const day of cycleData.calendar) {
+      map.set(day.date, day.phase);
+    }
+    return map;
+  }, [cycleData]);
 
   return (
     <View className="bg-white">
@@ -254,20 +128,24 @@ export function Calendar({ cycles, currentMonth }: CalendarProps) {
 
           {weeks.map((week, i) => (
             <View key={i} className="flex-row">
-              {week.map((day, j) => (
-                <DayCell
-                  key={j}
-                  day={day}
-                  currentMonth={month}
-                  cycles={cycles}
-                  predictedDates={predictedDates}
-                />
-              ))}
+              {week.map((day, j) => {
+                const dateKey = format(day, "yyyy-MM-dd");
+                const phase = phaseMap.get(dateKey) ?? "luteal";
+                const isTodayDate = dateKey === today;
+                return (
+                  <DayCell
+                    key={j}
+                    day={day}
+                    currentMonth={month}
+                    phase={phase}
+                    isToday={isTodayDate}
+                  />
+                );
+              })}
             </View>
           ))}
         </View>
       ))}
-      {/*<Legend />*/}
     </View>
   );
 }

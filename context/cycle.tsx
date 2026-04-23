@@ -78,7 +78,8 @@ export function CycleProvider({ children }: CycleProviderProps) {
       const mapped = data.map((p: PeriodRecord) => ({
         id: p.id,
         periodStartDate: p.start_dt,
-        periodEndDate: p.end_dt,
+        periodEndDate: p.end_dt ?? "",
+        cycleLength: 28,
         symptoms: p.symptoms,
       }));
       setCycles(mapped);

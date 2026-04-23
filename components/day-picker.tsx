@@ -1,133 +1,31 @@
-import type { CycleEntry } from "@/lib/types";
-import { eachDayOfInterval, endOfMonth, format, isToday } from "date-fns";
+import type { CalendarDay, CycleOutput } from "@/lib/cycle-engine";
+import { format, getTime, parseISO } from "date-fns";
 import { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { SansText } from "./text";
 
 interface DayPickerProps {
-  cycles: CycleEntry[];
+  cycleData: CycleOutput;
+  today: string;
 }
 
-interface PredictedDates {
-  periodDates: Set<string>;
-  fertileDates: Set<string>;
-  ovulationDates: Set<string>;
-}
-
-function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
-  if (cycles.length === 0) {
-    return { periodDates: new Set(), fertileDates: new Set(), ovulationDates: new Set() };
-  }
-
-  const sorted = [...cycles].sort(
-    (a, b) =>
-      new Date(a.periodStartDate).getTime() -
-      new Date(b.periodStartDate).getTime(),
-  );
-
-  const avgLength = Math.round(
-    sorted.reduce((sum, c) => sum + c.cycleLength, 0) / sorted.length,
-  );
-  const avgDuration = Math.round(
-    sorted.reduce((sum, c) => {
-      const start = new Date(c.periodStartDate);
-      const end = new Date(c.periodEndDate);
-      return (
-        sum + (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24) + 1
-      );
-    }, 0) / sorted.length,
-  );
-
-  const lastCycle = sorted[sorted.length - 1];
-  const lastStart = new Date(lastCycle.periodStartDate);
-
-  const periodDates = new Set<string>();
-  const fertileDates = new Set<string>();
-  const ovulationDates = new Set<string>();
-
-  for (let i = 1; i <= 3; i++) {
-    const predictedStart = new Date(lastStart);
-    predictedStart.setDate(predictedStart.getDate() + avgLength * i);
-    const predictedEnd = new Date(predictedStart);
-    predictedEnd.setDate(predictedEnd.getDate() + avgDuration - 1);
-
-    const days = eachDayOfInterval({
-      start: predictedStart,
-      end: predictedEnd,
-    });
-    days.forEach((day) => {
-      if (day >= new Date()) {
-        periodDates.add(format(day, "yyyy-MM-dd"));
-      }
-    });
-
-    const ovulationDate = new Date(predictedStart);
-    ovulationDate.setDate(ovulationDate.getDate() - 14);
-    if (ovulationDate >= new Date()) {
-      ovulationDates.add(format(ovulationDate, "yyyy-MM-dd"));
-      for (let d = -5; d <= 1; d++) {
-        const fertileDate = new Date(ovulationDate);
-        fertileDate.setDate(fertileDate.getDate() + d);
-        if (fertileDate >= new Date()) {
-          fertileDates.add(format(fertileDate, "yyyy-MM-dd"));
-        }
-      }
-    }
-  }
-
-  return { periodDates, fertileDates, ovulationDates };
-}
+const PHASE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
+  predicted_period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
+  ovulation: { bg: "bg-purple-100", text: "text-purple-700", border: "border-transparent" },
+  fertile: { bg: "bg-emerald-100", text: "text-emerald-700", border: "border-transparent" },
+  luteal: { bg: "bg-neutral-50", text: "text-neutral-800", border: "border-transparent" },
+  delay: { bg: "bg-amber-100", text: "text-amber-600", border: "border-transparent" },
+};
 
 interface DayItemProps {
   date: Date;
-  cycles: CycleEntry[];
-  predictedDates: PredictedDates;
+  phase: string;
+  isToday: boolean;
 }
 
-function DayItem({ date, cycles, predictedDates }: DayItemProps) {
-  const dateKey = format(date, "yyyy-MM-dd");
-  const today = isToday(date);
-
-  const inPeriod = cycles.some((cycle) => {
-    const start = new Date(cycle.periodStartDate);
-    const end = new Date(cycle.periodEndDate);
-    const dayStr = format(date, "yyyy-MM-dd");
-    return (
-      dayStr >= format(start, "yyyy-MM-dd") &&
-      dayStr <= format(end, "yyyy-MM-dd")
-    );
-  });
-  const isPredictedPeriod =
-    !inPeriod && predictedDates.periodDates.has(dateKey);
-  const inFertileWindow = predictedDates.fertileDates.has(dateKey);
-  const isOvulation = predictedDates.ovulationDates.has(dateKey);
-
-  const isPeriodHighlighted = inPeriod || isPredictedPeriod;
-  const isFertileHighlighted = inFertileWindow && !isPeriodHighlighted;
-  const isOvulationDay = isOvulation && !isPeriodHighlighted;
-
-  const pillBg = isPeriodHighlighted
-    ? "bg-rose-100"
-    : isOvulationDay
-      ? "bg-purple-100"
-      : isFertileHighlighted
-        ? "bg-emerald-100"
-        : "bg-neutral-50";
-  const pillBorder = today
-    ? "border-rose-400"
-    : isOvulationDay
-      ? "border-purple-500"
-      : isFertileHighlighted
-        ? "border-emerald-400"
-        : "border-transparent";
-  const textColor = isPeriodHighlighted
-    ? "text-rose-600"
-    : isOvulationDay
-      ? "text-purple-700"
-      : isFertileHighlighted
-        ? "text-emerald-700"
-        : "text-neutral-800";
-  const todayUnderline = today ? "border-b-[1px] border-rose-400" : "";
+function DayItem({ date, phase, isToday }: DayItemProps) {
+  const colors = PHASE_COLORS[phase] ?? PHASE_COLORS.luteal;
 
   return (
     <View className="w-12 items-center mx-1">
@@ -136,13 +34,12 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
       </SansText>
       <View
         className={[
-          "size-10 rounded-full flex-row items-center justify-center border",
-          pillBg,
-          pillBorder,
-          todayUnderline,
+          "size-10 rounded-full flex-row items-center justify-center border-2",
+          colors.bg,
+          isToday ? "border-rose-400" : colors.border,
         ].join(" ")}
       >
-        <SansText className={["text-sm", textColor].join(" ")}>
+        <SansText className={["text-sm font-bold", colors.text].join(" ")}>
           {format(date, "d")}
         </SansText>
       </View>
@@ -150,15 +47,26 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
   );
 }
 
-export function DayPicker({ cycles }: DayPickerProps) {
+export function DayPicker({ cycleData, today }: DayPickerProps) {
+  const todayDate = useMemo(() => parseISO(today), [today]);
   const days = useMemo(() => {
-    const now = new Date();
-    const start = now;
-    const end = endOfMonth(now);
-    return eachDayOfInterval({ start, end });
-  }, []);
+    const result: Date[] = [];
+    for (let i = 0; i < 11; i++) {
+      const d = new Date(todayDate);
+      d.setDate(d.getDate() + i);
+      result.push(d);
+    }
+    return result;
+  }, [todayDate]);
 
-  const predictedDates = useMemo(() => getPredictedDates(cycles), [cycles]);
+  const phaseMap = useMemo(() => {
+    if (!cycleData?.calendar) return new Map<string, string>();
+    const map = new Map<string, string>();
+    for (const day of cycleData.calendar) {
+      map.set(day.date, day.phase);
+    }
+    return map;
+  }, [cycleData]);
 
   return (
     <View className="bg-white border-b border-neutral-200/80 py-3">
@@ -167,14 +75,14 @@ export function DayPicker({ cycles }: DayPickerProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 8 }}
       >
-        {days.map((date) => (
-          <DayItem
-            key={date.getTime()}
-            date={date}
-            cycles={cycles}
-            predictedDates={predictedDates}
-          />
-        ))}
+        {days.map((date) => {
+          const dateKey = format(date, "yyyy-MM-dd");
+          const phase = phaseMap.get(dateKey) ?? "luteal";
+          const isTodayDate = dateKey === today;
+          return (
+            <DayItem key={getTime(date)} date={date} phase={phase} isToday={isTodayDate} />
+          );
+        })}
       </ScrollView>
     </View>
   );
