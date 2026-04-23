@@ -1,4 +1,4 @@
-import { useCycles } from "@/context/cycle";
+import type { CycleEntry } from "@/lib/types";
 import {
   calculateAverageCycleLength,
   calculateAveragePeriodDuration,
@@ -7,6 +7,10 @@ import {
 import { format } from "date-fns";
 import { ScrollView, View } from "react-native";
 import { SansText } from "./text";
+
+interface StatsOverviewProps {
+  cycles: CycleEntry[];
+}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -91,8 +95,7 @@ function SectionTitle({ children }: { children: string }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function StatsOverview() {
-  const { cycles } = useCycles();
+export function StatsOverview({ cycles }: StatsOverviewProps) {
 
   const avgCycleLength = calculateAverageCycleLength(cycles);
   const avgPeriodDuration = calculateAveragePeriodDuration(cycles);

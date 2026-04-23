@@ -21,11 +21,12 @@ import TextField from "./text-field";
 
 interface LogBottomSheetProps {
   onClose?: () => void;
+  onSave?: () => void;
 }
 
 export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
-  ({ onClose }, ref) => {
-    const { addCycle } = useCycles();
+  ({ onClose, onSave }, ref) => {
+    const { addPeriod } = useCycles();
 
     const today = startOfDay(new Date());
     const todayStr = format(today, "yyyy-MM-dd");
@@ -59,7 +60,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
 
       setIsSubmitting(true);
       try {
-        await addCycle(startDate, endDate, selectedSymptoms);
+        await addPeriod(startDate, endDate, selectedSymptoms);
         setStartDate(todayStr);
         setEndDate(todayStr);
         setSelectedSymptoms([]);
@@ -69,6 +70,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
         Alert.alert("Error", "Failed to save period");
       } finally {
         setIsSubmitting(false);
+        onSave?.();
       }
     };
 
@@ -81,7 +83,8 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
       <BottomSheet
         ref={ref}
         index={-1}
-        // snapPoints={snapPoints}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
         enablePanDownToClose
         backgroundStyle={{
           backgroundColor: COLORS.background,

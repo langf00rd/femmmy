@@ -23,7 +23,7 @@ export interface PeriodRecord {
 interface CycleContextValue {
   cycles: CycleEntry[];
   isLoading: boolean;
-  addCycle: (
+  addPeriod: (
     startDate: string,
     endDate: string,
     symptoms?: string[],

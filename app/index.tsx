@@ -9,7 +9,7 @@ import { COLORS } from "@/lib/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 function transformPeriodsToCycles(data: any[]): CycleEntry[] {
@@ -71,6 +71,11 @@ export default function HomeScreen() {
     bottomSheetRef.current?.expand();
   };
 
+  const handleRefreshPeriods = useCallback(async () => {
+    const data = await fetchPeriods();
+    if (data) setPeriodRecords(data);
+  }, [fetchPeriods]);
+
   const handleCloseBottomSheet = () => {
     setSheetOpen(false);
   };
@@ -91,7 +96,7 @@ export default function HomeScreen() {
         }
       />
       <DayPicker cycles={periodCycles} />
-      <StatsOverview />
+      <StatsOverview cycles={periodCycles} />
       <TouchableOpacity
         style={{ backgroundColor: COLORS.primary }}
         className="absolute size-14 p-2 bottom-10 right-4 rounded-full flex-row items-center justify-center"
@@ -99,7 +104,7 @@ export default function HomeScreen() {
       >
         <Plus size={20} color="white" />
       </TouchableOpacity>
-      <LogBottomSheet ref={bottomSheetRef} onClose={handleCloseBottomSheet} />
+      <LogBottomSheet ref={bottomSheetRef} onClose={handleCloseBottomSheet} onSave={handleRefreshPeriods} />
     </View>
   );
 }
