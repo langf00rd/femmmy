@@ -62,11 +62,12 @@ const PREDICTED_FUTURE_CYCLES = 10;
 interface PredictedDates {
   periodDates: Set<string>;
   fertileDates: Set<string>;
+  ovulationDates: Set<string>;
 }
 
 function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
   if (cycles.length === 0) {
-    return { periodDates: new Set(), fertileDates: new Set() };
+    return { periodDates: new Set(), fertileDates: new Set(), ovulationDates: new Set() };
   }
 
   const sorted = [...cycles].sort(
@@ -93,6 +94,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
 
   const periodDates = new Set<string>();
   const fertileDates = new Set<string>();
+  const ovulationDates = new Set<string>();
 
   for (let i = 1; i <= PREDICTED_FUTURE_CYCLES; i++) {
     const predictedStart = addDays(lastStart, avgLength * i);
@@ -111,6 +113,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
 
     const ovulationDate = subDays(predictedStart, 14);
     if (ovulationDate >= new Date()) {
+      ovulationDates.add(format(ovulationDate, "yyyy-MM-dd"));
       for (let d = -5; d <= 1; d++) {
         const fertileDate = addDays(ovulationDate, d);
         if (fertileDate >= new Date()) {
@@ -120,7 +123,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
     }
   }
 
-  return { periodDates, fertileDates };
+  return { periodDates, fertileDates, ovulationDates };
 }
 
 // ─── sub-components ───────────────────────────────────────────────────────────
@@ -149,25 +152,33 @@ function DayCell({ day, currentMonth, cycles, predictedDates }: DayCellProps) {
   const isPredictedPeriod =
     !inPeriod && predictedDates.periodDates.has(dateKey);
   const inFertileWindow = predictedDates.fertileDates.has(dateKey);
+  const isOvulation = predictedDates.ovulationDates.has(dateKey);
 
   const isPeriodHighlighted = inPeriod || isPredictedPeriod;
   const isFertileHighlighted = inFertileWindow && !isPeriodHighlighted;
+  const isOvulationDay = isOvulation && !isPeriodHighlighted;
 
   const cellBg = isPeriodHighlighted
     ? "bg-rose-100"
-    : isFertileHighlighted
-      ? "bg-emerald-100"
-      : "bg-transparent";
+    : isOvulationDay
+      ? "bg-purple-100"
+      : isFertileHighlighted
+        ? "bg-emerald-100"
+        : "bg-transparent";
   const cellBorder = today
     ? "border border-rose-400"
-    : "border border-transparent";
+    : isOvulationDay
+      ? "border border-purple-500"
+      : "border border-transparent";
   const textColor = !isCurrentMonth
     ? "text-neutral-300"
     : isPeriodHighlighted
       ? "text-rose-600"
-      : isFertileHighlighted
-        ? "text-emerald-700"
-        : "text-neutral-800";
+      : isOvulationDay
+        ? "text-purple-700"
+        : isFertileHighlighted
+          ? "text-emerald-700"
+          : "text-neutral-800";
   const textWeight = today ? "" : "";
 
   return (

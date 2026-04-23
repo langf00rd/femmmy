@@ -11,11 +11,12 @@ interface DayPickerProps {
 interface PredictedDates {
   periodDates: Set<string>;
   fertileDates: Set<string>;
+  ovulationDates: Set<string>;
 }
 
 function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
   if (cycles.length === 0) {
-    return { periodDates: new Set(), fertileDates: new Set() };
+    return { periodDates: new Set(), fertileDates: new Set(), ovulationDates: new Set() };
   }
 
   const sorted = [...cycles].sort(
@@ -42,6 +43,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
 
   const periodDates = new Set<string>();
   const fertileDates = new Set<string>();
+  const ovulationDates = new Set<string>();
 
   for (let i = 1; i <= 3; i++) {
     const predictedStart = new Date(lastStart);
@@ -62,6 +64,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
     const ovulationDate = new Date(predictedStart);
     ovulationDate.setDate(ovulationDate.getDate() - 14);
     if (ovulationDate >= new Date()) {
+      ovulationDates.add(format(ovulationDate, "yyyy-MM-dd"));
       for (let d = -5; d <= 1; d++) {
         const fertileDate = new Date(ovulationDate);
         fertileDate.setDate(fertileDate.getDate() + d);
@@ -72,7 +75,7 @@ function getPredictedDates(cycles: CycleEntry[]): PredictedDates {
     }
   }
 
-  return { periodDates, fertileDates };
+  return { periodDates, fertileDates, ovulationDates };
 }
 
 interface DayItemProps {
@@ -97,25 +100,33 @@ function DayItem({ date, cycles, predictedDates }: DayItemProps) {
   const isPredictedPeriod =
     !inPeriod && predictedDates.periodDates.has(dateKey);
   const inFertileWindow = predictedDates.fertileDates.has(dateKey);
+  const isOvulation = predictedDates.ovulationDates.has(dateKey);
 
   const isPeriodHighlighted = inPeriod || isPredictedPeriod;
   const isFertileHighlighted = inFertileWindow && !isPeriodHighlighted;
+  const isOvulationDay = isOvulation && !isPeriodHighlighted;
 
   const pillBg = isPeriodHighlighted
     ? "bg-rose-100"
-    : isFertileHighlighted
-      ? "bg-emerald-100"
-      : "bg-neutral-50";
+    : isOvulationDay
+      ? "bg-purple-100"
+      : isFertileHighlighted
+        ? "bg-emerald-100"
+        : "bg-neutral-50";
   const pillBorder = today
     ? "border-rose-400"
-    : isFertileHighlighted
-      ? "border-emerald-400"
-      : "border-transparent";
+    : isOvulationDay
+      ? "border-purple-500"
+      : isFertileHighlighted
+        ? "border-emerald-400"
+        : "border-transparent";
   const textColor = isPeriodHighlighted
     ? "text-rose-600"
-    : isFertileHighlighted
-      ? "text-emerald-700"
-      : "text-neutral-800";
+    : isOvulationDay
+      ? "text-purple-700"
+      : isFertileHighlighted
+        ? "text-emerald-700"
+        : "text-neutral-800";
   const todayUnderline = today ? "border-b-[1px] border-rose-400" : "";
 
   return (
