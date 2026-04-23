@@ -83,6 +83,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
       <BottomSheet
         ref={ref}
         index={-1}
+        snapPoints={["70%", "90%"]}
         keyboardBehavior="interactive"
         keyboardBlurBehavior="restore"
         enablePanDownToClose
