@@ -30,6 +30,7 @@ interface CycleContextValue {
   ) => Promise<void>;
   deleteCycle: (id: string) => Promise<void>;
   clearAllData: () => Promise<void>;
+  fetchPeriods: () => Promise<any[]>;
 }
 
 const CycleContext = createContext<CycleContextValue | undefined>(undefined);
