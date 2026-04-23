@@ -31,6 +31,7 @@ interface AuthContextValue {
   ) => Promise<{ error: Error | null }>;
   refreshProfile: () => Promise<void>;
   fetchUserSession: () => Promise<{ session: unknown }>;
+  deleteAccount: () => Promise<{ error: Error | null }>;
 }
 
 const STORAGE_KEYS = {
@@ -76,12 +77,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       .select("*")
       .eq("id", userId)
       .single();
-
-    if (error) {
-      console.error("Error fetching profile:", error);
-      return null;
+    console.log("[fetchProfile]", data, error);
+    if (!data) {
+      throw new Error("Your account must've been deleted. Contact support");
     }
-
+    if (error) throw new Error(error.message);
     return data as UserProfile;
   }, []);
 
@@ -95,10 +95,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       password,
     });
 
+    console.log("[signIn]", data.user?.id, error);
+
     if (error) throw new Error(error.message);
     if (!data?.user) throw new Error("No user found");
 
-    const userProfile = await fetchProfile(data.user.id);
+    const userProfile = await fetchProfile(data.user?.id);
     await setStoredProfile(userProfile);
   }
 
@@ -136,6 +138,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [user, fetchProfile]);
 
+  const deleteAccount = useCallback(async () => {
+    const profile = await getProfile();
+    if (!profile) return { error: null };
+
+    const { error: periodError } = await supabase
+      .from("periods")
+      .delete()
+      .eq("user_id", profile.id);
+
+    if (periodError) {
+      return { error: periodError };
+    }
+
+    const { error: profileError } = await supabase
+      .from("users")
+      .delete()
+      .eq("id", profile.id);
+
+    if (profileError) {
+      return { error: profileError };
+    }
+
+    const { error: authError } = await supabase.auth.signOut();
+
+    if (authError) {
+      return { error: authError };
+    }
+
+    await setStoredProfile(null);
+
+    return { error: null };
+  }, [getProfile]);
+
   const isOnboardingComplete = useCallback(async () => {
     const profile = await getStoredProfile();
     return !!profile?.date_of_birth;
@@ -155,6 +190,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         updateProfile,
         refreshProfile,
         fetchUserSession,
+        deleteAccount,
       }}
     >
       {children}

@@ -151,12 +151,12 @@ export function CycleProvider({ children }: CycleProviderProps) {
   }, []);
 
   const clearAllData = useCallback(async () => {
-    if (!user) return;
+    const user = await getProfile();
 
     const { error } = await supabase
       .from("periods")
       .delete()
-      .eq("user_id", user.id);
+      .eq("user_id", user!.id);
 
     if (error) {
       console.error("Error clearing cycles:", error);

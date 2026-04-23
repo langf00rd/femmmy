@@ -12,24 +12,6 @@ interface ButtonProps {
   className?: string;
 }
 
-// const variantStyles = {
-//   primary: {
-//     button: `bg-[${COLORS.primary}]`,
-//     text: "text-white",
-//     indicator: "#fff",
-//   },
-//   danger: {
-//     button: "bg-white border-2 border-red-600",
-//     text: "text-red-600",
-//     indicator: "#dc2626",
-//   },
-//   secondary: {
-//     button: "bg-white border border-gray-200",
-//     text: "text-gray-700",
-//     indicator: "#dc2626",
-//   },
-// } as const;
-
 export function Button({
   title,
   onPress,
@@ -39,25 +21,45 @@ export function Button({
   style,
   className,
 }: ButtonProps) {
-  // const v = variantStyles[variant];
   const isDisabled = disabled || loading;
+  
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "danger":
+        return {
+          button: { backgroundColor: "#dc2626" },
+          text: "text-white",
+        };
+      case "secondary":
+        return {
+          button: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#d1d5db" },
+          text: "#374151",
+        };
+      case "primary":
+      default:
+        return {
+          button: { backgroundColor: COLORS.primary },
+          text: "text-white",
+        };
+    }
+  };
+  
+  const variantStyles = getVariantStyles();
 
   return (
     <TouchableOpacity
       className={`flex-row items-center justify-center py-4 rounded-full ${isDisabled ? "opacity-60" : ""} ${className ?? ""}`}
       style={[
         style,
-        {
-          backgroundColor: COLORS.primary,
-        },
+        variantStyles.button,
       ]}
       onPress={onPress}
       disabled={isDisabled}
     >
       {loading ? (
-        <ActivityIndicator />
+        <ActivityIndicator color={variantStyles.text === "text-white" ? "#fff" : "#374151"} />
       ) : (
-        <SansText className={`text-white`}>{title}</SansText>
+        <SansText className={variantStyles.text}>{title}</SansText>
       )}
     </TouchableOpacity>
   );

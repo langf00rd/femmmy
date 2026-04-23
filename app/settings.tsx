@@ -10,8 +10,8 @@ import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { signOut } = useAuth();
-  const { cycles, clearAllData } = useCycles();
+  const { signOut, deleteAccount } = useAuth();
+  const { clearAllData } = useCycles();
 
   const handleLogout = async () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -30,7 +30,7 @@ export default function SettingsScreen() {
   const handleClearData = () => {
     Alert.alert(
       "Clear All Data",
-      "Are you sure you want to delete all your cycle data? This action cannot be undone.",
+      "Are you sure you want to delete all your cycle data? This will also log you out.",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -38,6 +38,30 @@ export default function SettingsScreen() {
           style: "destructive",
           onPress: async () => {
             await clearAllData();
+            await signOut();
+            router.replace("/auth/login");
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account and all data? This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          onPress: async () => {
+            const result = await deleteAccount();
+            if (result.error) {
+              Alert.alert("Error", result.error.message);
+            } else {
+              router.replace("/auth/login");
+            }
           },
         },
       ],
@@ -63,17 +87,11 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <SansText style={styles.sectionTitle}>Account</SansText>
           <View style={styles.card}>
-            <Button title="Log Out" onPress={handleLogout} variant="secondary" />
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <SansText style={styles.sectionTitle}>Data</SansText>
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <SansText style={styles.label}>Logged Cycles</SansText>
-              <SansText style={styles.value}>{cycles.length}</SansText>
-            </View>
+            <Button
+              title="Log Out"
+              onPress={handleLogout}
+              variant="secondary"
+            />
           </View>
         </View>
 
@@ -90,6 +108,17 @@ export default function SettingsScreen() {
               predictions.
             </SansText>
           </View>
+
+          <View style={[styles.card, { marginTop: 12 }]}>
+            <Button
+              title="Delete Account"
+              onPress={handleDeleteAccount}
+              variant="danger"
+            />
+            <SansText style={styles.warningText}>
+              This will permanently delete your account and all associated data.
+            </SansText>
+          </View>
         </View>
 
         <View style={styles.footer}>
@@ -104,17 +133,6 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    paddingTop: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#1f2937",
-    marginBottom: 28,
-  },
   section: {
     marginBottom: 28,
   },
@@ -131,26 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 6,
     padding: 20,
-    // shadowColor: "#000",
-    // shadowOffset: { width: 0, height: 1 },
-    // shadowOpacity: 0.05,
-    // shadowRadius: 3,
     elevation: 1,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#374151",
-  },
-  value: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#dc2626",
   },
   warningText: {
     fontSize: 13,
