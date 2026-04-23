@@ -63,8 +63,8 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user] = useState<User | null>(null);
+  const [isLoading] = useState(true);
 
   async function fetchUserSession() {
     const { data } = await supabase.auth.getSession();

@@ -11,7 +11,7 @@ import { Alert, KeyboardAvoidingView, Platform, View } from "react-native";
 
 export default function PersonalInfoScreen() {
   const { updateProfile } = useAuth();
-  const { cycles, isLoading: cyclesLoading, fetchPeriods } = useCycles();
+  const { fetchPeriods } = useCycles();
   const router = useRouter();
 
   const [dateOfBirth, setDateOfBirth] = useState("");

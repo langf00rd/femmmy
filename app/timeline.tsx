@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { AppBar } from "@/components/app-bar";
 import { Calendar } from "@/components/Calendar";
 import { SansText } from "@/components/text";
-import { computeCycle, type CycleOutput } from "@/lib/cycle-engine";
+import { computeCycle } from "@/lib/cycle-engine";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
 import { XIcon } from "lucide-react-native";

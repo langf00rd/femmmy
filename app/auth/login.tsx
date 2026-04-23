@@ -13,8 +13,8 @@ export default function LoginScreen() {
   const { signIn, getProfile } = useAuth();
   const { fetchPeriods } = useCycles();
   const router = useRouter();
-  const [email, setEmail] = useState("user@site.com");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {

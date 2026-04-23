@@ -5,7 +5,6 @@ import {
   endOfWeek,
   format,
   isSameMonth,
-  isToday,
   startOfMonth,
   startOfWeek,
 } from "date-fns";

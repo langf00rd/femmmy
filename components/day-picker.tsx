@@ -1,4 +1,4 @@
-import type { CalendarDay, CycleOutput } from "@/lib/cycle-engine";
+import type { CycleOutput } from "@/lib/cycle-engine";
 import { format, getTime, parseISO } from "date-fns";
 import { useMemo } from "react";
 import { ScrollView, View } from "react-native";

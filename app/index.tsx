@@ -3,7 +3,7 @@ import { AppBar } from "@/components/app-bar";
 import { DayPicker } from "@/components/day-picker";
 import { LogBottomSheet } from "@/components/log-bottom-sheet";
 import { StatsOverview } from "@/components/stats-overview";
-import { computeCycle, type CycleOutput } from "@/lib/cycle-engine";
+import { computeCycle } from "@/lib/cycle-engine";
 import { useCycles } from "@/context/cycle";
 import { useLocalFont } from "@/hooks/use-font";
 import { COLORS } from "@/lib/theme";
@@ -21,7 +21,6 @@ export default function HomeScreen() {
   const [, setSheetOpen] = useState(false);
 
   const [periodRecords, setPeriodRecords] = useState<any[]>([]);
-  const [cycleOutput, setCycleOutput] = useState<CycleOutput | null>(null);
 
   useEffect(() => {
     async function loadPeriods() {

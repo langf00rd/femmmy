@@ -55,7 +55,9 @@ export function CycleProvider({ children }: CycleProviderProps) {
     return data;
   }
 
-  const fetchCycles = useCallback(async () => {
+  // Legacy function kept for future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _fetchCycles = useCallback(async () => {
     if (!user) {
       setCycles([]);
       setIsLoading(false);
@@ -94,7 +96,9 @@ export function CycleProvider({ children }: CycleProviderProps) {
   //   fetchCycles();
   // }, [fetchCycles]);
 
-  const recalculateCycleLength = useCallback(
+  // Legacy function kept for future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const recalculateCycleLength = useCallback(
     (newCycles: CycleEntry[]): number => {
       if (newCycles.length < 2) {
         return 28;
