@@ -52,47 +52,10 @@ export function CycleProvider({ children }: CycleProviderProps) {
       .from("periods")
       .select("*")
       .eq("user_id", profile.id)
-      .order("start_dt", { ascending: false });
+.order("start_dt", { ascending: false });
     if (error) throw new Error(error.message);
     return data;
   }
-
-  // Legacy function kept for future use
-
-  // useEffect(() => {
-  //   fetchCycles();
-  // }, [fetchCycles]);
-
-  // Legacy function kept for future use
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const recalculateCycleLength = useCallback(
-    (newCycles: CycleEntry[]): number => {
-      if (newCycles.length < 2) {
-        return 28;
-      }
-
-      const sorted = [...newCycles].sort(
-        (a, b) =>
-          new Date(a.periodStartDate).getTime() -
-          new Date(b.periodStartDate).getTime(),
-      );
-
-      const lengths: number[] = [];
-      for (let i = 1; i < sorted.length; i++) {
-        const prevStart = parseISO(sorted[i - 1].periodStartDate);
-        const currStart = parseISO(sorted[i].periodStartDate);
-        lengths.push(differenceInDays(currStart, prevStart));
-      }
-
-      if (lengths.length === 0) {
-        return 28;
-      }
-
-      const total = lengths.reduce((sum, l) => sum + l, 0);
-      return Math.round(total / lengths.length);
-    },
-    [],
-  );
 
   async function addPeriod(
     startDate: string,
