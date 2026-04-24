@@ -6,7 +6,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { differenceInDays, format, parseISO, startOfDay } from "date-fns";
-import { forwardRef, React, useState } from "react";
+import { forwardRef, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -100,6 +100,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
           />
         )}
       >
+        {null}
         <BottomSheetView
           className="flex-1"
           style={{
@@ -217,6 +218,7 @@ export const LogBottomSheet = forwardRef<BottomSheet, LogBottomSheetProps>(
             )}*/}
           </ScrollView>
         </BottomSheetView>
+        {null}
       </BottomSheet>
     );
   },

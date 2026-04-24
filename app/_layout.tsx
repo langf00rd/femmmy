@@ -10,8 +10,13 @@ import "../global.css";
 function RootNavigation() {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
+  const isAuthRoute = segments.includes("auth" as never);
 
-  if (!isLoading && !isAuthenticated && !segments.includes("auth")) {
+  if (!isLoading && isAuthenticated && isAuthRoute) {
+    return <Redirect href="/" />;
+  }
+
+  if (!isLoading && !isAuthenticated && !isAuthRoute) {
     return <Redirect href="/auth/login" />;
   }
 

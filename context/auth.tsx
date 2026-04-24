@@ -1,10 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { User } from "@supabase/supabase-js";
+import * as SecureStore from "expo-secure-store";
 import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -36,6 +38,8 @@ interface AuthContextValue {
 
 const STORAGE_KEYS = {
   PROFILE: "femmmy_profile",
+  SESSION_ACCESS_TOKEN: "femmmy_session_access",
+  SESSION_REFRESH_TOKEN: "femmmy_session_refresh",
 } as const;
 
 async function getStoredProfile(): Promise<UserProfile | null> {
@@ -45,6 +49,42 @@ async function getStoredProfile(): Promise<UserProfile | null> {
     return JSON.parse(stored) as UserProfile;
   } catch {
     return null;
+  }
+}
+
+async function getStoredSession(): Promise<{
+  access_token: string;
+  refresh_token: string;
+} | null> {
+  try {
+    const accessToken = await SecureStore.getItemAsync(
+      STORAGE_KEYS.SESSION_ACCESS_TOKEN,
+    );
+    const refreshToken = await SecureStore.getItemAsync(
+      STORAGE_KEYS.SESSION_REFRESH_TOKEN,
+    );
+    if (!accessToken || !refreshToken) return null;
+    return { access_token: accessToken, refresh_token: refreshToken };
+  } catch {
+    return null;
+  }
+}
+
+async function setStoredSession(
+  session: { access_token: string; refresh_token: string } | null,
+): Promise<void> {
+  if (session) {
+    await SecureStore.setItemAsync(
+      STORAGE_KEYS.SESSION_ACCESS_TOKEN,
+      session.access_token,
+    );
+    await SecureStore.setItemAsync(
+      STORAGE_KEYS.SESSION_REFRESH_TOKEN,
+      session.refresh_token,
+    );
+  } else {
+    await SecureStore.deleteItemAsync(STORAGE_KEYS.SESSION_ACCESS_TOKEN);
+    await SecureStore.deleteItemAsync(STORAGE_KEYS.SESSION_REFRESH_TOKEN);
   }
 }
 
@@ -63,8 +103,33 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user] = useState<User | null>(null);
-  const [isLoading] = useState(true);
+  const [storedProfile, setStoredProfileState] = useState<UserProfile | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getStoredProfile().then(async (profile) => {
+      setStoredProfileState(profile);
+
+      const session = await getStoredSession();
+      if (session) {
+        supabase.auth.setSession(session);
+      }
+
+      setIsLoading(false);
+    });
+  }, []);
+
+  // const storedProfile = useCallback(async () => {
+  //   return await getStoredProfile();
+  // }, []);
+
+  const isAuthenticated = storedProfile !== null;
+
+  console.log("[storedProfile]", storedProfile);
+  console.log("[isAuthenticated]", isAuthenticated);
+  console.log("[isLoading]", isLoading);
 
   async function fetchUserSession() {
     const { data } = await supabase.auth.getSession();
@@ -97,11 +162,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     console.log("[signIn]", data.user?.id, error);
 
-    if (error) throw new Error(error.message);
-    if (!data?.user) throw new Error("No user found");
+    if (error) return { error: new Error(error.message) };
+    if (!data?.user) return { error: new Error("No user found") };
 
-    const userProfile = await fetchProfile(data.user?.id);
+    if (data.session) {
+      const sessionData = {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      };
+      await setStoredSession(sessionData);
+      supabase.auth.setSession(sessionData);
+    }
+
+    const userProfile = await fetchProfile(data.user.id);
     await setStoredProfile(userProfile);
+    return { error: null };
   }
 
   async function signUp(email: string, password: string) {
@@ -109,34 +184,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
       email,
       password,
     });
-    if (error) throw new Error(error.message);
+    if (error) return { error: new Error(error.message) };
+    return { error: null };
   }
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
     await setStoredProfile(null);
+    await setStoredSession(null);
+    if (error) console.error("[signOut]", error);
   }, []);
 
   async function updateProfile(data: Partial<UserProfile>) {
-    const user = await getProfile();
+    const profile = await getProfile();
+    if (!profile) return { error: new Error("No profile found") };
 
     const { error } = await supabase
       .from("users")
       .update(data)
-      .eq("id", user!.id);
+      .eq("id", profile.id);
 
-    if (error) throw new Error(error.message);
+    if (error) return { error: new Error(error.message) };
 
-    const updatedProfile = await fetchProfile(user!.id);
+    const updatedProfile = await fetchProfile(profile.id);
     await setStoredProfile(updatedProfile);
+    return { error: null };
   }
 
   const refreshProfile = useCallback(async () => {
-    if (user) {
-      const updatedProfile = await fetchProfile(user.id);
+    if (storedProfile) {
+      const updatedProfile = await fetchProfile(storedProfile.id);
       await setStoredProfile(updatedProfile);
     }
-  }, [user, fetchProfile]);
+  }, [storedProfile, fetchProfile]);
 
   const deleteAccount = useCallback(async () => {
     const profile = await getProfile();
@@ -179,10 +259,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: null,
         getProfile,
         isLoading,
-        isAuthenticated: !!user,
+        isAuthenticated,
         isOnboardingComplete,
         signIn,
         signUp,

@@ -40,65 +40,32 @@ interface CycleProviderProps {
 }
 
 export function CycleProvider({ children }: CycleProviderProps) {
-  const { user, getProfile } = useAuth();
+  const { getProfile } = useAuth();
   const [cycles, setCycles] = useState<CycleEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchPeriods() {
-    const user = await getProfile();
+    const profile = await getProfile();
+    if (!profile) return [];
+
     const { data, error } = await supabase
       .from("periods")
       .select("*")
-      .eq("user_id", user!.id)
+      .eq("user_id", profile.id)
       .order("start_dt", { ascending: false });
     if (error) throw new Error(error.message);
     return data;
   }
 
   // Legacy function kept for future use
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _fetchCycles = useCallback(async () => {
-    if (!user) {
-      setCycles([]);
-      setIsLoading(false);
-      return [];
-    }
-
-    setIsLoading(true);
-    const { data, error } = await supabase
-      .from("periods")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("start_dt", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching cycles:", error);
-      setCycles([]);
-      setIsLoading(false);
-      return [];
-    } else if (data) {
-      const mapped = data.map((p: PeriodRecord) => ({
-        id: p.id,
-        periodStartDate: p.start_dt,
-        periodEndDate: p.end_dt ?? "",
-        cycleLength: 28,
-        symptoms: p.symptoms,
-      }));
-      setCycles(mapped);
-      setIsLoading(false);
-      return mapped;
-    }
-    setIsLoading(false);
-    return [];
-  }, [user]);
 
   // useEffect(() => {
   //   fetchCycles();
   // }, [fetchCycles]);
 
   // Legacy function kept for future use
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const recalculateCycleLength = useCallback(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const recalculateCycleLength = useCallback(
     (newCycles: CycleEntry[]): number => {
       if (newCycles.length < 2) {
         return 28;
@@ -155,12 +122,13 @@ const recalculateCycleLength = useCallback(
   }, []);
 
   const clearAllData = useCallback(async () => {
-    const user = await getProfile();
+    const profile = await getProfile();
+    if (!profile) return;
 
     const { error } = await supabase
       .from("periods")
       .delete()
-      .eq("user_id", user!.id);
+      .eq("user_id", profile.id);
 
     if (error) {
       console.error("Error clearing cycles:", error);
@@ -168,7 +136,7 @@ const recalculateCycleLength = useCallback(
     }
 
     setCycles([]);
-  }, [user]);
+  }, []);
 
   const value: CycleContextValue = {
     cycles,
