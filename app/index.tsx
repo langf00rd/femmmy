@@ -1,13 +1,13 @@
-import { format } from "date-fns";
 import { AppBar } from "@/components/app-bar";
 import { DayPicker } from "@/components/day-picker";
 import { LogBottomSheet } from "@/components/log-bottom-sheet";
 import { StatsOverview } from "@/components/stats-overview";
-import { computeCycle } from "@/lib/cycle-engine";
 import { useCycles } from "@/context/cycle";
 import { useLocalFont } from "@/hooks/use-font";
+import { computeCycle } from "@/lib/cycle-engine";
 import { COLORS } from "@/lib/theme";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -41,6 +41,8 @@ export default function HomeScreen() {
     if (hour >= 12 && hour < 18) return "good afternoon.";
     return "good evening.";
   }, []);
+
+  console.log("[greeting]", greeting);
 
   const todayStr = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
 
@@ -82,7 +84,11 @@ export default function HomeScreen() {
       >
         <Plus size={20} color="white" />
       </TouchableOpacity>
-      <LogBottomSheet ref={bottomSheetRef} onClose={handleCloseBottomSheet} onSave={handleRefreshPeriods} />
+      <LogBottomSheet
+        ref={bottomSheetRef}
+        onClose={handleCloseBottomSheet}
+        onSave={handleRefreshPeriods}
+      />
     </View>
   );
 }

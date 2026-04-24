@@ -14,7 +14,12 @@ export function AppBar(props: {
     >
       <View className="flex items-center justify-between flex-row px-4">
         {props.leading}
-        <SansText className={`text-3xl ${props.titleClassName}`}>
+        <SansText
+          className={`w-fit text-3xl ${props.titleClassName}`}
+          style={{
+            fontWeight: 500,
+          }}
+        >
           {props.title}
         </SansText>
         {props.action}
