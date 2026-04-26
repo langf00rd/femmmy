@@ -1,20 +1,16 @@
 import { AppBar } from "@/components/app-bar";
 import { Button } from "@/components/button";
+import Section from "@/components/section";
 import Switch from "@/components/switch";
 import { SansText } from "@/components/text";
 import { useAuth } from "@/context/auth";
 import { useBiometricSettings } from "@/context/biometric";
 import { useCycles } from "@/context/cycle";
+import { COLORS } from "@/lib/theme";
 import { useRouter } from "expo-router";
-import { ChevronLeft, Fingerprint } from "lucide-react-native";
+import { Fingerprint } from "lucide-react-native";
 import React from "react";
-import {
-  Alert,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -79,35 +75,24 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View>
-      <AppBar
-        className="border-b border-b-neutral-200/20"
-        action={<View />}
-        leading={
-          <View className="flex-row items-center gap-5">
-            <TouchableOpacity className="p-2" onPress={() => router.back()}>
-              <ChevronLeft size={24} color="#374151" />
-            </TouchableOpacity>
-            <SansText className="text-xl">Settings</SansText>
-          </View>
-        }
-      />
+    <View style={{ backgroundColor: COLORS.background, flex: 1 }}>
+      <AppBar title="Settings" />
 
-      <ScrollView className="p-4">
-        <View style={styles.section}>
+      <ScrollView className="p-4 gap-4">
+        <Section>
           <SansText style={styles.sectionTitle}>Account</SansText>
-          <View style={styles.card}>
+          <View>
             <Button
               title="Log Out"
               onPress={handleLogout}
               variant="secondary"
             />
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
+        <Section>
           <SansText style={styles.sectionTitle}>Security</SansText>
-          <View style={styles.card}>
+          <View>
             <View style={styles.switchRow}>
               <View style={styles.switchLabel}>
                 <Fingerprint size={20} color="#6b7280" />
@@ -127,36 +112,42 @@ export default function SettingsScreen() {
               </SansText>
             )}
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
+        <Section>
           <SansText style={styles.sectionTitle}>Clear all cycle data</SansText>
-          <View style={styles.card}>
+          <View>
             <Button
               title="Clear All Data"
               onPress={handleClearData}
               variant="danger"
             />
-            <SansText style={styles.warningText}>
+            <SansText
+              style={{ color: COLORS.mutedForeground }}
+              className="mt-4"
+            >
               This will permanently delete all your cycle history and
               predictions.
             </SansText>
           </View>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
+        <Section>
           <SansText style={styles.sectionTitle}>Delete your account</SansText>
-          <View style={styles.card}>
+          <View>
             <Button
               title="Delete Account"
               onPress={handleDeleteAccount}
               variant="danger"
             />
-            <SansText style={styles.warningText}>
+            <SansText
+              style={{ color: COLORS.mutedForeground }}
+              className="mt-4"
+            >
               This will permanently delete your account and all associated data.
             </SansText>
           </View>
-        </View>
+        </Section>
       </ScrollView>
     </View>
   );
@@ -165,6 +156,9 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   section: {
     marginBottom: 28,
+    backgroundColor: "#F1F1F1aa",
+    padding: 10,
+    borderRadius: 6,
   },
   sectionTitle: {
     fontSize: 13,
@@ -176,10 +170,10 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 6,
-    padding: 20,
-    elevation: 1,
+    // backgroundColor: "#fff",
+    // borderRadius: 6,
+    // padding: 20,
+    // elevation: 1,
   },
   switchRow: {
     flexDirection: "row",

@@ -11,7 +11,7 @@ import { isoToReadable } from "@/lib/utils";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
-import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
+import { CalendarDays, Plus } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, TouchableOpacity, View } from "react-native";
 
@@ -86,15 +86,12 @@ export default function HomeScreen() {
           </View>
         }
         action={
-          <View className="flex-row gap-6">
+          <View>
             <TouchableOpacity onPress={() => router.push("/timeline")}>
               <CalendarDays
                 size={20}
                 style={{ color: COLORS.mutedForeground }}
               />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push("/settings")}>
-              <Settings2 size={20} style={{ color: COLORS.mutedForeground }} />
             </TouchableOpacity>
           </View>
         }

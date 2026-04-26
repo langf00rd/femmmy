@@ -27,8 +27,8 @@ export function Button({
     switch (variant) {
       case "danger":
         return {
-          button: { backgroundColor: "#dc2626" },
-          text: "text-white",
+          button: { backgroundColor: COLORS.destructive },
+          text: "text-red-700",
         };
       case "secondary":
         return {
@@ -62,7 +62,9 @@ export function Button({
           color={variantStyles.text === "text-white" ? "#fff" : "#374151"}
         />
       ) : (
-        <SansText className={variantStyles.text}>{title}</SansText>
+        <SansText className={variantStyles.text} style={{ fontWeight: 600 }}>
+          {title}
+        </SansText>
       )}
     </TouchableOpacity>
   );

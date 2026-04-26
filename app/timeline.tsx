@@ -1,13 +1,10 @@
-import { format } from "date-fns";
-import { AppBar } from "@/components/app-bar";
 import { Calendar } from "@/components/Calendar";
-import { SansText } from "@/components/text";
-import { computeCycle } from "@/lib/cycle-engine";
 import { useCycles } from "@/context/cycle";
+import { computeCycle } from "@/lib/cycle-engine";
+import { format } from "date-fns";
 import { useRouter } from "expo-router";
-import { XIcon } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView } from "react-native";
 
 export default function Timeline() {
   const router = useRouter();
@@ -30,27 +27,13 @@ export default function Timeline() {
   }, [periodRecords]);
 
   return (
-    <View className="flex-1 bg-white">
-      <AppBar
-        className="border-b border-b-neutral-200/20"
-        action={<View />}
-        leading={
-          <View className="flex-row items-center gap-5">
-            <TouchableOpacity className="p-2" onPress={() => router.back()}>
-              <XIcon size={26} />
-            </TouchableOpacity>
-            <SansText className="text-xl">Timeline</SansText>
-          </View>
-        }
+    <ScrollView className="pt-10 bg-white">
+      <Calendar
+        cycleData={cycleData}
+        currentMonth={currentMonth}
+        onMonthChange={setCurrentMonth}
+        today={todayStr}
       />
-      <ScrollView>
-        <Calendar
-          cycleData={cycleData}
-          currentMonth={currentMonth}
-          onMonthChange={setCurrentMonth}
-          today={todayStr}
-        />
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 }

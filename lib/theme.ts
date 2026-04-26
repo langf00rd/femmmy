@@ -5,4 +5,6 @@ export const COLORS = {
   // background: "#F6F4F5",
   background: "#FFF",
   foreground: "#1F2937",
+  destructive: "#dc262622",
+  destructiveForeground: "#dc2626",
 };

@@ -9,8 +9,8 @@ import {
   startOfWeek,
 } from "date-fns";
 import { useMemo } from "react";
-import { SansText } from "./text";
 import { View } from "react-native";
+import { SansText } from "./text";
 
 interface CalendarProps {
   cycleData: CycleOutput;
@@ -21,13 +21,40 @@ interface CalendarProps {
 
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
-const PHASE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
-  predicted_period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
-  ovulation: { bg: "bg-purple-100", text: "text-purple-700", border: "border-transparent" },
-  fertile: { bg: "bg-emerald-100", text: "text-emerald-700", border: "border-transparent" },
-  luteal: { bg: "bg-transparent", text: "text-neutral-800", border: "border-transparent" },
-  delay: { bg: "bg-amber-100", text: "text-amber-600", border: "border-transparent" },
+const PHASE_COLORS: Record<
+  string,
+  { bg: string; text: string; border: string }
+> = {
+  period: {
+    bg: "bg-rose-100",
+    text: "text-rose-600",
+    border: "border-transparent",
+  },
+  predicted_period: {
+    bg: "bg-rose-100",
+    text: "text-rose-600",
+    border: "border-transparent",
+  },
+  ovulation: {
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    border: "border-transparent",
+  },
+  fertile: {
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    border: "border-transparent",
+  },
+  luteal: {
+    bg: "bg-transparent",
+    text: "text-neutral-800",
+    border: "border-transparent",
+  },
+  delay: {
+    bg: "bg-amber-100",
+    text: "text-amber-600",
+    border: "border-transparent",
+  },
 };
 
 function buildCalendarWeeks(currentMonth: Date): Date[][] {
@@ -81,9 +108,10 @@ function DayCell({ day, currentMonth, phase, isToday }: DayCellProps) {
         ].join(" ")}
       >
         <SansText
-          className={["text-[13px] leading-none font-medium", isCurrentMonth ? colors.text : "text-neutral-300"].join(
-            " ",
-          )}
+          className={[
+            "text-[14px] leading-none font-medium",
+            isCurrentMonth ? colors.text : "text-neutral-300",
+          ].join(" ")}
         >
           {format(day, "d")}
         </SansText>
