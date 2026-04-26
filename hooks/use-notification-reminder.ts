@@ -25,16 +25,19 @@ async function requestPermissions() {
 async function scheduleReminderNotification() {
   await Notifications.cancelAllScheduledNotificationsAsync();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const trigger: any = {
+    type: 'interval' as const,
+    repeats: true,
+    seconds: 300,
+  };
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Open Femmmy',
       body: 'Don\'t forget to track your cycle today!',
     },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.REPEAT_INTERVAL,
-      repeats: true,
-      interval: 300 * 1000,
-    },
+    trigger,
   });
 }
 

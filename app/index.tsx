@@ -90,7 +90,7 @@ export default function HomeScreen() {
             <TouchableOpacity onPress={() => router.push("/timeline")}>
               <CalendarDays
                 size={20}
-                style={{ color: COLORS.mutedForeground }}
+                color={COLORS.mutedForeground}
               />
             </TouchableOpacity>
           </View>

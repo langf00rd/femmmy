@@ -2,12 +2,10 @@ import { Calendar } from "@/components/Calendar";
 import { useCycles } from "@/context/cycle";
 import { computeCycle } from "@/lib/cycle-engine";
 import { format } from "date-fns";
-import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ScrollView } from "react-native";
 
 export default function Timeline() {
-  const router = useRouter();
   const { fetchPeriods } = useCycles();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [periodRecords, setPeriodRecords] = useState<any[]>([]);

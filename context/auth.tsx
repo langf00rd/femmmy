@@ -21,6 +21,7 @@ export interface UserProfile {
 
 interface AuthContextValue {
   user: User | null;
+  storedProfile: UserProfile | null;
   getProfile: () => Promise<UserProfile | null>;
   isLoading: boolean;
   isAuthenticated: boolean;
