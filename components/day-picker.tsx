@@ -9,13 +9,40 @@ interface DayPickerProps {
   today: string;
 }
 
-const PHASE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
-  predicted_period: { bg: "bg-rose-100", text: "text-rose-600", border: "border-transparent" },
-  ovulation: { bg: "bg-purple-100", text: "text-purple-700", border: "border-transparent" },
-  fertile: { bg: "bg-emerald-100", text: "text-emerald-700", border: "border-transparent" },
-  luteal: { bg: "bg-neutral-50", text: "text-neutral-800", border: "border-transparent" },
-  delay: { bg: "bg-amber-100", text: "text-amber-600", border: "border-transparent" },
+const PHASE_COLORS: Record<
+  string,
+  { bg: string; text: string; border: string }
+> = {
+  period: {
+    bg: "bg-rose-100",
+    text: "text-rose-600",
+    border: "border-transparent",
+  },
+  predicted_period: {
+    bg: "bg-rose-100",
+    text: "text-rose-600",
+    border: "border-transparent",
+  },
+  ovulation: {
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    border: "border-transparent",
+  },
+  fertile: {
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    border: "border-transparent",
+  },
+  luteal: {
+    bg: "bg-transparent",
+    text: "text-neutral-400",
+    border: "border-transparent",
+  },
+  delay: {
+    bg: "bg-amber-100",
+    text: "text-amber-600",
+    border: "border-transparent",
+  },
 };
 
 interface DayItemProps {
@@ -29,17 +56,23 @@ function DayItem({ date, phase, isToday }: DayItemProps) {
 
   return (
     <View className="w-12 items-center mx-1">
-      <SansText className="text-[10px] text-neutral-400 mb-2">
+      <SansText
+        className="text-neutral-400 text-[13px] uppercase mb-2"
+        style={{ fontWeight: 500 }}
+      >
         {format(date, "EEE")}
       </SansText>
       <View
         className={[
           "size-10 rounded-full flex-row items-center justify-center border-2",
           colors.bg,
-          isToday ? "border-rose-400" : colors.border,
+          isToday ? "border-neutral-500" : colors.border,
         ].join(" ")}
       >
-        <SansText className={["text-sm font-bold", colors.text].join(" ")}>
+        <SansText
+          className={["text-[13px]", colors.text].join(" ")}
+          style={{ fontWeight: 600 }}
+        >
           {format(date, "d")}
         </SansText>
       </View>
@@ -69,7 +102,7 @@ export function DayPicker({ cycleData, today }: DayPickerProps) {
   }, [cycleData]);
 
   return (
-    <View className="bg-white border-b border-neutral-200/80 py-3">
+    <View className="bg-white py-3">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -80,7 +113,12 @@ export function DayPicker({ cycleData, today }: DayPickerProps) {
           const phase = phaseMap.get(dateKey) ?? "luteal";
           const isTodayDate = dateKey === today;
           return (
-            <DayItem key={getTime(date)} date={date} phase={phase} isToday={isTodayDate} />
+            <DayItem
+              key={getTime(date)}
+              date={date}
+              phase={phase}
+              isToday={isTodayDate}
+            />
           );
         })}
       </ScrollView>

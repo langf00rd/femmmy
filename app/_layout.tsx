@@ -1,16 +1,20 @@
 import { AuthProvider, useAuth } from "@/context/auth";
+import { BiometricSettingsProvider } from "@/context/biometric";
 import { CycleProvider } from "@/context/cycle";
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Redirect, Stack, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
+import { AppLockOverlay } from "@/hooks/app-lock-overlay";
+import { useNotificationReminder } from "@/hooks/use-notification-reminder";
 import "../global.css";
 
 function RootNavigation() {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const isAuthRoute = segments.includes("auth" as never);
+  useNotificationReminder();
 
   if (!isLoading && isAuthenticated && isAuthRoute) {
     return <Redirect href="/" />;
@@ -42,7 +46,10 @@ export default function RootLayout() {
       <ThemeProvider value={DefaultTheme}>
         <AuthProvider>
           <CycleProvider>
-            <RootNavigation />
+            <BiometricSettingsProvider>
+              <RootNavigation />
+              <AppLockOverlay />
+            </BiometricSettingsProvider>
           </CycleProvider>
         </AuthProvider>
       </ThemeProvider>

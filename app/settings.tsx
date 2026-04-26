@@ -1,17 +1,27 @@
 import { AppBar } from "@/components/app-bar";
 import { Button } from "@/components/button";
+import Switch from "@/components/switch";
 import { SansText } from "@/components/text";
 import { useAuth } from "@/context/auth";
+import { useBiometricSettings } from "@/context/biometric";
 import { useCycles } from "@/context/cycle";
 import { useRouter } from "expo-router";
-import { ChevronLeft } from "lucide-react-native";
+import { ChevronLeft, Fingerprint } from "lucide-react-native";
 import React from "react";
-import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { signOut, deleteAccount } = useAuth();
   const { clearAllData } = useCycles();
+  const { isBiometricAvailable, isBiometricEnabled, setBiometricEnabled } =
+    useBiometricSettings();
 
   const handleLogout = async () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -83,7 +93,7 @@ export default function SettingsScreen() {
         }
       />
 
-      <View className="p-4">
+      <ScrollView className="p-4">
         <View style={styles.section}>
           <SansText style={styles.sectionTitle}>Account</SansText>
           <View style={styles.card}>
@@ -96,7 +106,31 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <SansText style={styles.sectionTitle}>Danger Zone</SansText>
+          <SansText style={styles.sectionTitle}>Security</SansText>
+          <View style={styles.card}>
+            <View style={styles.switchRow}>
+              <View style={styles.switchLabel}>
+                <Fingerprint size={20} color="#6b7280" />
+                <SansText style={styles.switchText}>
+                  Biometric App Lock
+                </SansText>
+              </View>
+              <Switch
+                value={isBiometricEnabled}
+                onValueChange={setBiometricEnabled}
+                disabled={!isBiometricAvailable}
+              />
+            </View>
+            {!isBiometricAvailable && (
+              <SansText style={styles.biometricHint}>
+                Biometrics not available on this device
+              </SansText>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <SansText style={styles.sectionTitle}>Clear all cycle data</SansText>
           <View style={styles.card}>
             <Button
               title="Clear All Data"
@@ -108,8 +142,11 @@ export default function SettingsScreen() {
               predictions.
             </SansText>
           </View>
+        </View>
 
-          <View style={[styles.card, { marginTop: 12 }]}>
+        <View style={styles.section}>
+          <SansText style={styles.sectionTitle}>Delete your account</SansText>
+          <View style={styles.card}>
             <Button
               title="Delete Account"
               onPress={handleDeleteAccount}
@@ -120,14 +157,7 @@ export default function SettingsScreen() {
             </SansText>
           </View>
         </View>
-
-        <View style={styles.footer}>
-          <SansText style={styles.footerText}>Femmmy v1.0.0</SansText>
-          <SansText style={styles.footerSubtext}>
-            Your data stays on your device
-          </SansText>
-        </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -150,6 +180,26 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 20,
     elevation: 1,
+  },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  switchLabel: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  switchText: {
+    fontSize: 15,
+    color: "#374151",
+  },
+  biometricHint: {
+    fontSize: 12,
+    color: "#9ca3af",
+    marginTop: 8,
+    textAlign: "center",
   },
   warningText: {
     fontSize: 13,

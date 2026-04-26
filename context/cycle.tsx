@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase";
 import type { CycleEntry } from "@/lib/types";
-import { differenceInDays, parseISO } from "date-fns";
 import {
   createContext,
   useCallback,
@@ -43,16 +42,18 @@ export function CycleProvider({ children }: CycleProviderProps) {
   const { getProfile } = useAuth();
   const [cycles, setCycles] = useState<CycleEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loaders, setLoaders] = useState({
+    periods: true,
+  });
 
   async function fetchPeriods() {
     const profile = await getProfile();
     if (!profile) return [];
-
     const { data, error } = await supabase
       .from("periods")
       .select("*")
       .eq("user_id", profile.id)
-.order("start_dt", { ascending: false });
+      .order("start_dt", { ascending: false });
     if (error) throw new Error(error.message);
     return data;
   }

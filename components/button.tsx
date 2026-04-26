@@ -22,7 +22,7 @@ export function Button({
   className,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
-  
+
   const getVariantStyles = () => {
     switch (variant) {
       case "danger":
@@ -32,7 +32,11 @@ export function Button({
         };
       case "secondary":
         return {
-          button: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#d1d5db" },
+          button: {
+            backgroundColor: "#fff",
+            borderWidth: 1,
+            borderColor: "#d1d5db",
+          },
           text: "#374151",
         };
       case "primary":
@@ -43,21 +47,20 @@ export function Button({
         };
     }
   };
-  
+
   const variantStyles = getVariantStyles();
 
   return (
     <TouchableOpacity
       className={`flex-row items-center justify-center py-4 rounded-full ${isDisabled ? "opacity-60" : ""} ${className ?? ""}`}
-      style={[
-        style,
-        variantStyles.button,
-      ]}
+      style={[style, variantStyles.button]}
       onPress={onPress}
       disabled={isDisabled}
     >
       {loading ? (
-        <ActivityIndicator color={variantStyles.text === "text-white" ? "#fff" : "#374151"} />
+        <ActivityIndicator
+          color={variantStyles.text === "text-white" ? "#fff" : "#374151"}
+        />
       ) : (
         <SansText className={variantStyles.text}>{title}</SansText>
       )}

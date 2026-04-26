@@ -103,27 +103,21 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const [storedProfile, setStoredProfileState] = useState<UserProfile | null>(
     null,
   );
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getStoredProfile().then(async (profile) => {
       setStoredProfileState(profile);
-
       const session = await getStoredSession();
       if (session) {
         supabase.auth.setSession(session);
       }
-
       setIsLoading(false);
     });
   }, []);
-
-  // const storedProfile = useCallback(async () => {
-  //   return await getStoredProfile();
-  // }, []);
 
   const isAuthenticated = storedProfile !== null;
 
@@ -271,6 +265,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         refreshProfile,
         fetchUserSession,
         deleteAccount,
+        storedProfile,
       }}
     >
       {children}

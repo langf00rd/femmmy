@@ -2,31 +2,38 @@ import { AppBar } from "@/components/app-bar";
 import { DayPicker } from "@/components/day-picker";
 import { LogBottomSheet } from "@/components/log-bottom-sheet";
 import { StatsOverview } from "@/components/stats-overview";
+import { SansText } from "@/components/text";
 import { useCycles } from "@/context/cycle";
 import { useLocalFont } from "@/hooks/use-font";
 import { computeCycle } from "@/lib/cycle-engine";
 import { COLORS } from "@/lib/theme";
+import { isoToReadable } from "@/lib/utils";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { CalendarDays, Plus, Settings2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Alert, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
   useLocalFont();
-  const { fetchPeriods } = useCycles();
   const router = useRouter();
+  const { fetchPeriods } = useCycles();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [, setSheetOpen] = useState(false);
-
   const [periodRecords, setPeriodRecords] = useState<any[]>([]);
 
   useEffect(() => {
     async function loadPeriods() {
-      const data = await fetchPeriods();
-      if (data) setPeriodRecords(data);
+      try {
+        const data = await fetchPeriods();
+        if (data) setPeriodRecords(data);
+      } catch (err) {
+        console.error("[error fetching periods]", err);
+        Alert.alert("Error", (err as Error).message);
+      }
     }
+
     loadPeriods();
   }, [fetchPeriods]);
 
@@ -60,17 +67,34 @@ export default function HomeScreen() {
     setSheetOpen(false);
   };
 
+  const todayReadable = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+
   return (
     <View className="flex-1 " style={{ backgroundColor: COLORS.background }}>
       <AppBar
-        title={greeting}
+        className="-mt-2 -mb-4"
+        titleSlot={
+          <View>
+            <SansText
+              className="text-2xl"
+              style={{
+                fontWeight: 600,
+              }}
+            >
+              {isoToReadable(todayReadable, { format: "mm-yy" })}
+            </SansText>
+          </View>
+        }
         action={
-          <View className="flex-row gap-10">
+          <View className="flex-row gap-6">
             <TouchableOpacity onPress={() => router.push("/timeline")}>
-              <CalendarDays size={20} />
+              <CalendarDays
+                size={20}
+                style={{ color: COLORS.mutedForeground }}
+              />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push("/settings")}>
-              <Settings2 size={20} />
+              <Settings2 size={20} style={{ color: COLORS.mutedForeground }} />
             </TouchableOpacity>
           </View>
         }
